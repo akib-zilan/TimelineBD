@@ -17,7 +17,7 @@
         :root {
             /* Global */
             font-size: var(--global-scale, 100%); /* Controlled by JS */
-            --main-gap: var(--layout-gap, 5rem); /* Controlled by JS */
+            --main-gap: var(--layout-gap, 3rem); /* Controlled by JS - New Default */
             
             /* Timeline */
             --timeline-v-spacing: var(--month-spacing, 2rem); /* Controlled by JS */
@@ -32,10 +32,7 @@
             --sidebar-body-fs: var(--side-body-fs, 1rem); /* Controlled by JS */
             --sidebar-padding-y: var(--side-pady, 1.5rem); /* NEW */
             --sidebar-padding-x: var(--side-padx, 1.5rem); /* NEW */
-            --sidebar-mt: var(--side-mt, 0rem); /* NEW */
-            --sidebar-mb: var(--side-mb, 0rem); /* NEW */
-            --sidebar-ml: var(--side-ml, 0rem); /* NEW */
-            --sidebar-mr: var(--side-mr, 0rem); /* NEW */
+            /* DELETED Sidebar Margin Vars */
             
             /* Modals */
             --modal-title-fs: var(--pop-title-fs, 1.875rem); /* Controlled by JS */
@@ -357,11 +354,7 @@
         
         /* NEW: Sidebar Styles */
         #sidebar {
-            /* NEW: Controlled by JS */
-            margin-top: var(--sidebar-mt);
-            margin-bottom: var(--sidebar-mb);
-            margin-left: var(--sidebar-ml);
-            margin-right: var(--sidebar-mr);
+            /* DELETED Margin Properties */
         }
         
         #sidebar-content {
@@ -431,20 +424,7 @@
             overflow-y: auto;
         }
         
-        /* NEW: Debug Borders */
-        .main-app-content, .main-app-content header, .main-app-content main,
-        #timeline-container, .month-item, .month-card,
-        #context-bar-container, .context-bar-lane {
-            border: 1px dashed red;
-        }
-        
-        #sidebar {
-            border: 2px solid blue;
-        }
-        
-        #sidebar-content {
-            border: 2px solid green;
-        }
+        /* DELETED Debug Borders */
     </style>
 </head>
 <body class="antialiased text-gray-800">
@@ -762,9 +742,9 @@
                     <div class="space-y-2">
                         <div class="flex justify-between items-center">
                             <label for="layoutGapSlider" class="block text-base font-medium text-gray-700">Timeline/Sidebar Gap</label>
-                            <span id="layoutGapValue" class="range-value">5rem</span>
+                            <span id="layoutGapValue" class="range-value">3rem</span>
                         </div>
-                        <input type="range" id="layoutGapSlider" min="2" max="15" value="5" step="0.5" class="w-full"> <!-- Increased max -->
+                        <input type="range" id="layoutGapSlider" min="2" max="15" value="3" step="0.5" class="w-full"> <!-- Increased max, new default -->
                     </div>
                 </div>
                 
@@ -819,38 +799,7 @@
                 <!-- Column 3: Sidebar -->
                 <div class="space-y-6 p-4 bg-gray-50 rounded-lg border">
                     <h3 class="text-xl font-semibold border-b pb-2">Sidebar</h3>
-                    <!-- NEW: Sidebar Margin Top -->
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center">
-                            <label for="sidebarMtSlider" class="block text-base font-medium text-gray-700">Margin Top</label>
-                            <span id="sidebarMtValue" class="range-value">0rem</span>
-                        </div>
-                        <input type="range" id="sidebarMtSlider" min="-5" max="5" value="0" step="0.25" class="w-full"> <!-- -5 to +5 range -->
-                    </div>
-                    <!-- NEW: Sidebar Margin Bottom -->
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center">
-                            <label for="sidebarMbSlider" class="block text-base font-medium text-gray-700">Margin Bottom</label>
-                            <span id="sidebarMbValue" class="range-value">0rem</span>
-                        </div>
-                        <input type="range" id="sidebarMbSlider" min="-5" max="5" value="0" step="0.25" class="w-full"> <!-- -5 to +5 range -->
-                    </div>
-                    <!-- NEW: Sidebar Margin Left -->
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center">
-                            <label for="sidebarMlSlider" class="block text-base font-medium text-gray-700">Margin Left</label>
-                            <span id="sidebarMlValue" class="range-value">0rem</span>
-                        </div>
-                        <input type="range" id="sidebarMlSlider" min="-5" max="5" value="0" step="0.25" class="w-full"> <!-- -5 to +5 range -->
-                    </div>
-                    <!-- NEW: Sidebar Margin Right -->
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center">
-                            <label for="sidebarMrSlider" class="block text-base font-medium text-gray-700">Margin Right</label>
-                            <span id="sidebarMrValue" class="range-value">0rem</span>
-                        </div>
-                        <input type="range" id="sidebarMrSlider" min="-5" max="5" value="0" step="0.25" class="w-full"> <!-- -5 to +5 range -->
-                    </div>
+                    <!-- DELETED Margin Sliders -->
                     <!-- NEW: Sidebar Padding Y -->
                     <div class="space-y-2">
                         <div class="flex justify-between items-center">
@@ -1183,15 +1132,7 @@
         const modalPadYValue = document.getElementById('modalPadYValue');
         const modalPadXSlider = document.getElementById('modalPadXSlider');
         const modalPadXValue = document.getElementById('modalPadXValue');
-        // --- NEW Margin Sliders ---
-        const sidebarMtSlider = document.getElementById('sidebarMtSlider');
-        const sidebarMtValue = document.getElementById('sidebarMtValue');
-        const sidebarMbSlider = document.getElementById('sidebarMbSlider');
-        const sidebarMbValue = document.getElementById('sidebarMbValue');
-        const sidebarMlSlider = document.getElementById('sidebarMlSlider');
-        const sidebarMlValue = document.getElementById('sidebarMlValue');
-        const sidebarMrSlider = document.getElementById('sidebarMrSlider');
-        const sidebarMrValue = document.getElementById('sidebarMrValue');
+        // --- DELETED Margin Slider consts ---
 
 
         // --- NEW Analysis Modal Elements ---
@@ -1989,10 +1930,7 @@
                     document.documentElement.style.setProperty(cssVar, displayValue);
                     valueDisplay.textContent = displayValue;
                     localStorage.setItem(storageKey, value);
-                    // NEW: Special case for sidebar margins
-                    if (cssVar.startsWith('--sidebar-m')) {
-                        sidebar.style[cssVar.replace('--sidebar-','')] = displayValue;
-                    }
+                    // DELETED Special case for sidebar margins
                 });
             };
 
@@ -2012,18 +1950,14 @@
             createSliderListener(sidebarPadXSlider, sidebarPadXValue, 'uiSidebarPadX', '--sidebar-padding-x', 'rem');
             createSliderListener(modalPadYSlider, modalPadYValue, 'uiModalPadY', '--modal-padding-y', 'rem');
             createSliderListener(modalPadXSlider, modalPadXValue, 'uiModalPadX', '--modal-padding-x', 'rem');
-            // --- NEW Margin Listeners ---
-            createSliderListener(sidebarMtSlider, sidebarMtValue, 'uiSidebarMt', '--sidebar-mt', 'rem');
-            createSliderListener(sidebarMbSlider, sidebarMbValue, 'uiSidebarMb', '--sidebar-mb', 'rem');
-            createSliderListener(sidebarMlSlider, sidebarMlValue, 'uiSidebarMl', '--sidebar-ml', 'rem');
-            createSliderListener(sidebarMrSlider, sidebarMrValue, 'uiSidebarMr', '--sidebar-mr', 'rem');
+            // --- DELETED Margin Listeners ---
 
 
             uiResetBtn.addEventListener('click', () => {
                 // List of all settings [slider, storageKey, cssVar, defaultValue, unit]
                 const allSettings = [
                     [globalScaleSlider, 'uiScale', 'font-size', 100, '%'],
-                    [layoutGapSlider, 'uiGap', '--main-gap', 5, 'rem'],
+                    [layoutGapSlider, 'uiGap', '--main-gap', 3, 'rem'], // New Default
                     [verticalSpacingSlider, 'uiSpacing', '--timeline-v-spacing', 2, 'rem'],
                     [yearHeaderFsSlider, 'uiYearHeaderFs', '--timeline-year-fs', 2.25, 'rem'],
                     [monthCardFsSlider, 'uiMonthCardFs', '--timeline-card-fs', 1, 'rem'],
@@ -2038,10 +1972,7 @@
                     [sidebarPadXSlider, 'uiSidebarPadX', '--sidebar-padding-x', 1.5, 'rem'],
                     [modalPadYSlider, 'uiModalPadY', '--modal-padding-y', 2, 'rem'],
                     [modalPadXSlider, 'uiModalPadX', '--modal-padding-x', 2, 'rem'],
-                    [sidebarMtSlider, 'uiSidebarMt', '--sidebar-mt', 0, 'rem'],
-                    [sidebarMbSlider, 'uiSidebarMb', '--sidebar-mb', 0, 'rem'],
-                    [sidebarMlSlider, 'uiSidebarMl', '--sidebar-ml', 0, 'rem'],
-                    [sidebarMrSlider, 'uiSidebarMr', '--sidebar-mr', 0, 'rem'],
+                    // --- DELETED Margin Resets ---
                 ];
                 
                 allSettings.forEach(([slider, key, cssVar, value, unit]) => {
@@ -2052,10 +1983,7 @@
                     // Find the corresponding value display element
                     const valueDisplay = document.getElementById(slider.id.replace('Slider', 'Value'));
                     if (valueDisplay) valueDisplay.textContent = displayValue;
-                    // NEW: Special case for sidebar margins
-                    if (cssVar.startsWith('--sidebar-m')) {
-                        sidebar.style[cssVar.replace('--sidebar-','')] = displayValue;
-                    }
+                    // DELETED Special case for sidebar margins
                 });
             });
             
@@ -2088,7 +2016,7 @@
              // List of all settings [slider, storageKey, cssVar, defaultValue, unit]
             const allSettings = [
                 [globalScaleSlider, 'uiScale', 'font-size', 100, '%'],
-                [layoutGapSlider, 'uiGap', '--main-gap', 5, 'rem'],
+                [layoutGapSlider, 'uiGap', '--main-gap', 3, 'rem'], // New Default
                 [verticalSpacingSlider, 'uiSpacing', '--timeline-v-spacing', 2, 'rem'],
                 [yearHeaderFsSlider, 'uiYearHeaderFs', '--timeline-year-fs', 2.25, 'rem'],
                 [monthCardFsSlider, 'uiMonthCardFs', '--timeline-card-fs', 1, 'rem'],
@@ -2103,10 +2031,7 @@
                 [sidebarPadXSlider, 'uiSidebarPadX', '--sidebar-padding-x', 1.5, 'rem'],
                 [modalPadYSlider, 'uiModalPadY', '--modal-padding-y', 2, 'rem'],
                 [modalPadXSlider, 'uiModalPadX', '--modal-padding-x', 2, 'rem'],
-                [sidebarMtSlider, 'uiSidebarMt', '--sidebar-mt', 0, 'rem'],
-                [sidebarMbSlider, 'uiSidebarMb', '--sidebar-mb', 0, 'rem'],
-                [sidebarMlSlider, 'uiSidebarMl', '--sidebar-ml', 0, 'rem'],
-                [sidebarMrSlider, 'uiSidebarMr', '--sidebar-mr', 0, 'rem'],
+                // --- DELETED Margin Loads ---
             ];
             
             allSettings.forEach(([slider, key, cssVar, defaultValue, unit]) => {
@@ -2120,10 +2045,7 @@
                 const valueDisplay = document.getElementById(slider.id.replace('Slider', 'Value'));
                 if (valueDisplay) valueDisplay.textContent = displayValue;
                 
-                // NEW: Special case for sidebar margins on load
-                if (cssVar.startsWith('--sidebar-m')) {
-                    sidebar.style[cssVar.replace('--sidebar-','')] = displayValue;
-                }
+                // DELETED Special case for sidebar margins on load
             });
         }
         
