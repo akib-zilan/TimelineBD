@@ -2355,55 +2355,44 @@ if (valueDisplay) valueDisplay.textContent = displayValue;
 /**
          * Sets up the IntersectionObserver to watch year headers.
          */
-function observeYearHeaders(stickyTopPx = 180) { // NEW: Accepts dynamic top value
-if (yearObserver) yearObserver.disconnect(); // Disconnect old observer
+function observeYearHeaders(stickyTopPx = 180) {
+    if (yearObserver) yearObserver.disconnect(); // Disconnect old observer
 
-// NEW: Observe the year-block itself, not an anchor
-// Trigger when the top of the block hits the sticky line
-const observerOptions = {
-root: null, // viewport
-rootMargin: `-${stickyTopPx}px 0px -${window.innerHeight - stickyTopPx - 1}px 0px`,
-threshold: 0
-};
+    const observerOptions = {
+        root: null, // viewport
+        // This margin creates a 1px horizontal line at the sticky top position
+        // The observer will fire whenever a year-block crosses this line.
+        rootMargin: `-${stickyTopPx}px 0px -${window.innerHeight - stickyTopPx - 1}px 0px`,
+        threshold: 0
+    };
+    
+    yearObserver = new IntersectionObserver(() => {
+        // This callback fires whenever a year-block boundary is crossed.
+        // Instead of inspecting the intersection entries, which can be complex,
+        // we'll just determine the current state directly from the DOM.
+        // This is more reliable regardless of scroll direction.
 
-// UPDATED: Robust observer logic for scrolling up and down
-yearObserver = new IntersectionObserver((entries) => {
+        let newActiveYear = START_YEAR.toString(); // Default to the first year as a fallback
+        const stickyLinePosition = stickyTopPx + 1; // Position of the sticky line + a 1px buffer
 
-// The `entries` array is chronological. We only care about the most recent change.
-const latestEntry = entries[entries.length - 1];
-if (!latestEntry) return;
+        // Iterate through all year blocks to find the last one that has passed the sticky line.
+        // That will be our current active year.
+        document.querySelectorAll('.year-block').forEach(block => {
+            if (block.getBoundingClientRect().top <= stickyLinePosition) {
+                newActiveYear = block.dataset.year;
+            }
+        });
+        
+        // Update the sidebar only if the active year has actually changed.
+        if (newActiveYear && newActiveYear !== currentActiveYear) {
+            currentActiveYear = newActiveYear;
+            updateSidebarContent(currentActiveYear);
+        }
+    }, observerOptions);
 
-if (latestEntry.isIntersecting) {
-// This entry just *entered* the 1px line. This is our new active year.
-// This happens when scrolling DOWN (e.g., 1948 enters)
-// OR when scrolling UP (e.g., 1947 enters)
-const year = latestEntry.target.dataset.year;
-if (year && year !== currentActiveYear) {
-currentActiveYear = year;
-updateSidebarContent(year);
-}
-} else if (!latestEntry.isIntersecting && latestEntry.boundingClientRect.top < stickyTopPx) {
-// This entry just *left* the 1px line, moving *upwards*.
-// This means we are scrolling UP. The active year should be the one *before* this.
-const yearThatLeft = parseInt(latestEntry.target.dataset.year);
-if (yearThatLeft > START_YEAR) {
-const yearToActivate = (yearThatLeft - 1).toString();
-if (yearToActivate !== currentActiveYear) {
-currentActiveYear = yearToActivate;
-updateSidebarContent(yearToActivate);
-}
-}
-}
-// We don't need an `else` for `isIntersecting: false` and `boundingClientRect.top > stickyTopPx`
-// because that's "scrolling down", and the *next* block's `isIntersecting: true`
-// event will handle the update.
-
-}, observerOptions);
-
-// NEW: Observe the .year-block elements
-document.querySelectorAll('.year-block').forEach(block => {
-yearObserver.observe(block);
-});
+    document.querySelectorAll('.year-block').forEach(block => {
+        yearObserver.observe(block);
+    });
 }
 
 
