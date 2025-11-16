@@ -28,8 +28,9 @@
             --card-padding-x: var(--month-card-padx, 1.5rem); /* NEW */
             
             /* Sidebar */
-            --sidebar-title-fs: var(--side-title-fs, 1.875rem); /* Controlled by JS */
-            --sidebar-body-fs: var(--side-body-fs, 1rem); /* Controlled by JS */
+            /* NEW: 200% Larger Sidebar Fonts */
+            --sidebar-title-fs: var(--side-title-fs, 3.75rem); /* 200% of 1.875rem */
+            --sidebar-body-fs: var(--side-body-fs, 2rem); /* 200% of 1rem */
             --sidebar-padding-y: var(--side-pady, 1.5rem); /* NEW */
             --sidebar-padding-x: var(--side-padx, 1.5rem); /* NEW */
             /* DELETED Sidebar Margin Vars */
@@ -355,12 +356,17 @@
         /* NEW: Sidebar Styles */
         #sidebar {
             /* DELETED Margin Properties */
+            z-index: 40; /* NEW: Ensure sidebar is on top */
+            position: relative; /* NEW: Ensure z-index works */
         }
         
         #sidebar-content {
             position: sticky;
             top: 180px; 
             padding: var(--sidebar-padding-y) var(--sidebar-padding-x); /* NEW: Controlled by JS */
+            /* NEW: 50% Overlap */
+            transform: translateX(-50%);
+            z-index: 40;
         }
         
         #sidebar-content h2 { font-size: var(--sidebar-title-fs); }
@@ -423,8 +429,6 @@
             max-height: 300px;
             overflow-y: auto;
         }
-        
-        /* DELETED Debug Borders */
     </style>
 </head>
 <body class="antialiased text-gray-800">
@@ -820,18 +824,18 @@
                     <div class="space-y-2">
                         <div class="flex justify-between items-center">
                             <label for="sidebarTitleFsSlider" class="block text-base font-medium text-gray-700">Title Font</label>
-                            <span id="sidebarTitleFsValue" class="range-value">1.875rem</span>
+                            <span id="sidebarTitleFsValue" class="range-value">3.75rem</span>
                         </div>
-                        <input type="range" id="sidebarTitleFsSlider" min="1.25" max="3" value="1.875" step="0.125" class="w-full"> <!-- Increased max -->
+                        <input type="range" id="sidebarTitleFsSlider" min="1.25" max="5" value="3.75" step="0.125" class="w-full"> <!-- Increased max -->
                     </div>
                     
                     <!-- Sidebar Body Font Size -->
                     <div class="space-y-2">
                         <div class="flex justify-between items-center">
                             <label for="sidebarBodyFsSlider" class="block text-base font-medium text-gray-700">Body Font</label>
-                            <span id="sidebarBodyFsValue" class="range-value">1rem</span>
+                            <span id="sidebarBodyFsValue" class="range-value">2rem</span>
                         </div>
-                        <input type="range" id="sidebarBodyFsSlider" min="0.75" max="1.5" value="1" step="0.125" class="w-full"> <!-- Widened range -->
+                        <input type="range" id="sidebarBodyFsSlider" min="0.75" max="3" value="2" step="0.125" class="w-full"> <!-- Widened range -->
                     </div>
                 </div>
                 
@@ -1961,8 +1965,8 @@
                     [verticalSpacingSlider, 'uiSpacing', '--timeline-v-spacing', 2, 'rem'],
                     [yearHeaderFsSlider, 'uiYearHeaderFs', '--timeline-year-fs', 2.25, 'rem'],
                     [monthCardFsSlider, 'uiMonthCardFs', '--timeline-card-fs', 1, 'rem'],
-                    [sidebarTitleFsSlider, 'uiSidebarTitleFs', '--sidebar-title-fs', 1.875, 'rem'],
-                    [sidebarBodyFsSlider, 'uiSidebarBodyFs', '--sidebar-body-fs', 1, 'rem'],
+                    [sidebarTitleFsSlider, 'uiSidebarTitleFs', '--sidebar-title-fs', 3.75, 'rem'], // 200% default
+                    [sidebarBodyFsSlider, 'uiSidebarBodyFs', '--sidebar-body-fs', 2, 'rem'], // 200% default
                     [modalTitleFsSlider, 'uiModalTitleFs', '--modal-title-fs', 1.875, 'rem'],
                     [modalBodyFsSlider, 'uiModalBodyFs', '--modal-body-fs', 1, 'rem'],
                     // --- NEW Padding/Margin Resets ---
@@ -2020,8 +2024,8 @@
                 [verticalSpacingSlider, 'uiSpacing', '--timeline-v-spacing', 2, 'rem'],
                 [yearHeaderFsSlider, 'uiYearHeaderFs', '--timeline-year-fs', 2.25, 'rem'],
                 [monthCardFsSlider, 'uiMonthCardFs', '--timeline-card-fs', 1, 'rem'],
-                [sidebarTitleFsSlider, 'uiSidebarTitleFs', '--sidebar-title-fs', 1.875, 'rem'],
-                [sidebarBodyFsSlider, 'uiSidebarBodyFs', '--sidebar-body-fs', 1, 'rem'],
+                [sidebarTitleFsSlider, 'uiSidebarTitleFs', '--sidebar-title-fs', 3.75, 'rem'], // 200% default
+                [sidebarBodyFsSlider, 'uiSidebarBodyFs', '--sidebar-body-fs', 2, 'rem'], // 200% default
                 [modalTitleFsSlider, 'uiModalTitleFs', '--modal-title-fs', 1.875, 'rem'],
                 [modalBodyFsSlider, 'uiModalBodyFs', '--modal-body-fs', 1, 'rem'],
                 // --- NEW Padding/Margin Loads ---
