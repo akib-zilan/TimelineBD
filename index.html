@@ -24,19 +24,24 @@
             --timeline-h-padding: 3rem; /* Stays proportional to global scale */
             --timeline-year-fs: var(--year-header-fs, 2.25rem); /* Controlled by JS */
             --timeline-card-fs: var(--month-card-fs, 1rem); /* Controlled by JS */
+            --card-padding-y: var(--month-card-pady, 1.5rem); /* NEW */
+            --card-padding-x: var(--month-card-padx, 1.5rem); /* NEW */
             
             /* Sidebar */
             --sidebar-title-fs: var(--side-title-fs, 1.875rem); /* Controlled by JS */
             --sidebar-body-fs: var(--side-body-fs, 1rem); /* Controlled by JS */
+            --sidebar-padding-y: var(--side-pady, 1.5rem); /* NEW */
+            --sidebar-padding-x: var(--side-padx, 1.5rem); /* NEW */
+            --sidebar-mt: var(--side-mt, 0rem); /* NEW */
+            --sidebar-mb: var(--side-mb, 0rem); /* NEW */
+            --sidebar-ml: var(--side-ml, 0rem); /* NEW */
+            --sidebar-mr: var(--side-mr, 0rem); /* NEW */
             
             /* Modals */
             --modal-title-fs: var(--pop-title-fs, 1.875rem); /* Controlled by JS */
             --modal-body-fs: var(--pop-body-fs, 1rem); /* Controlled by JS */
-            
-            /* NEW: Padding Controls */
-            --card-padding: var(--month-card-pad, 1.5rem); /* p-6 */
-            --sidebar-padding: var(--side-pad, 1.5rem); /* p-6 */
-            --modal-padding: var(--pop-pad, 2rem); /* p-8 */
+            --modal-padding-y: var(--pop-pady, 2rem); /* NEW */
+            --modal-padding-x: var(--pop-padx, 2rem); /* NEW */
         }
         
         body {
@@ -118,7 +123,7 @@
         }
         
         .month-card {
-            padding: var(--card-padding); /* NEW: Controlled by JS */
+            padding: var(--card-padding-y) var(--card-padding-x); /* NEW: Controlled by JS */
         }
 
         /* Even items on the right */
@@ -186,11 +191,11 @@
         }
         
         /* NEW: Modal Padding Control */
-        #infoModal form { padding: var(--modal-padding); }
-        #contextModal > div { padding: var(--modal-padding); }
-        #figureModal form { padding: var(--modal-padding); }
-        #uiModal > div { padding: var(--modal-padding); }
-        #analysisModal > div { padding: var(--modal-padding); }
+        #infoModal form { padding: var(--modal-padding-y) var(--modal-padding-x); }
+        #contextModal > div { padding: var(--modal-padding-y) var(--modal-padding-x); }
+        #figureModal form { padding: var(--modal-padding-y) var(--modal-padding-x); }
+        #uiModal > div { padding: var(--modal-padding-y) var(--modal-padding-x); }
+        #analysisModal > div { padding: var(--modal-padding-y) var(--modal-padding-x); }
 
         /* Styles for compact view */
         .compact-view .month-item {
@@ -350,11 +355,19 @@
             margin-left: 8px;
         }
         
-        /* New Sidebar Styles */
+        /* NEW: Sidebar Styles */
+        #sidebar {
+            /* NEW: Controlled by JS */
+            margin-top: var(--sidebar-mt);
+            margin-bottom: var(--sidebar-mb);
+            margin-left: var(--sidebar-ml);
+            margin-right: var(--sidebar-mr);
+        }
+        
         #sidebar-content {
             position: sticky;
             top: 180px; 
-            padding: var(--sidebar-padding); /* NEW: Controlled by JS */
+            padding: var(--sidebar-padding-y) var(--sidebar-padding-x); /* NEW: Controlled by JS */
         }
         
         #sidebar-content h2 { font-size: var(--sidebar-title-fs); }
@@ -713,21 +726,21 @@
     </dialog>
     
     <!-- REBUILT: UI Settings Modal -->
-    <dialog id="uiModal" class="p-0 rounded-lg shadow-xl w-full max-w-4xl"> <!-- Increased size -->
+    <dialog id="uiModal" class="p-0 rounded-lg shadow-xl w-full max-w-5xl"> <!-- Increased size -->
         <div class="p-8 space-y-6">
             <h2 class="text-3xl font-semibold">Manage UI Settings</h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6"> <!-- 3 Columns -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6"> <!-- 4 Columns -->
                 <!-- Column 1: Global & Layout -->
                 <div class="space-y-6 p-4 bg-gray-50 rounded-lg border">
-                    <h3 class="text-xl font-semibold border-b pb-2">Global & Layout</h3>
+                    <h3 class="text-xl font-semibold border-b pb-2">Global & Gaps</h3>
                     <!-- Global Scale Slider -->
                     <div class="space-y-2">
                         <div class="flex justify-between items-center">
                             <label for="globalScaleSlider" class="block text-base font-medium text-gray-700">Global Scale (Zoom)</label>
                             <span id="globalScaleValue" class="range-value">100%</span>
                         </div>
-                        <input type="range" id="globalScaleSlider" min="80" max="130" value="100" class="w-full">
+                        <input type="range" id="globalScaleSlider" min="80" max="150" value="100" class="w-full"> <!-- Increased max -->
                     </div>
                     
                     <!-- Timeline/Sidebar Gap -->
@@ -736,17 +749,17 @@
                             <label for="layoutGapSlider" class="block text-base font-medium text-gray-700">Timeline/Sidebar Gap</label>
                             <span id="layoutGapValue" class="range-value">5rem</span>
                         </div>
-                        <input type="range" id="layoutGapSlider" min="2" max="10" value="5" step="0.5" class="w-full">
+                        <input type="range" id="layoutGapSlider" min="2" max="15" value="5" step="0.5" class="w-full"> <!-- Increased max -->
                     </div>
                 </div>
                 
-                <!-- Column 2: Timeline & Sidebar -->
+                <!-- Column 2: Timeline -->
                 <div class="space-y-6 p-4 bg-gray-50 rounded-lg border">
-                    <h3 class="text-xl font-semibold border-b pb-2">Timeline & Sidebar</h3>
+                    <h3 class="text-xl font-semibold border-b pb-2">Timeline</h3>
                     <!-- Vertical Spacing Slider -->
                     <div class="space-y-2">
                         <div class="flex justify-between items-center">
-                            <label for="verticalSpacingSlider" class="block text-base font-medium text-gray-700">Timeline Vertical Spacing</label>
+                            <label for="verticalSpacingSlider" class="block text-base font-medium text-gray-700">Vertical Spacing</label>
                             <span id="verticalSpacingValue" class="range-value">2rem</span>
                         </div>
                         <input type="range" id="verticalSpacingSlider" min="1" max="5" value="2" step="0.25" class="w-full"> <!-- Increased max -->
@@ -758,7 +771,7 @@
                             <label for="yearHeaderFsSlider" class="block text-base font-medium text-gray-700">Year Header Font</label>
                             <span id="yearHeaderFsValue" class="range-value">2.25rem</span>
                         </div>
-                        <input type="range" id="yearHeaderFsSlider" min="1.5" max="3" value="2.25" step="0.125" class="w-full">
+                        <input type="range" id="yearHeaderFsSlider" min="1.5" max="4" value="2.25" step="0.125" class="w-full"> <!-- Increased max -->
                     </div>
 
                     <!-- Month Card Font Size -->
@@ -770,68 +783,127 @@
                         <input type="range" id="monthCardFsSlider" min="0.75" max="1.5" value="1" step="0.125" class="w-full"> <!-- Widened range -->
                     </div>
                     
+                    <!-- NEW: Card Padding Y -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="monthCardPadYSlider" class="block text-base font-medium text-gray-700">Month Card Padding (Y)</label>
+                            <span id="monthCardPadYValue" class="range-value">1.5rem</span>
+                        </div>
+                        <input type="range" id="monthCardPadYSlider" min="0.5" max="3" value="1.5" step="0.25" class="w-full">
+                    </div>
+                    <!-- NEW: Card Padding X -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="monthCardPadXSlider" class="block text-base font-medium text-gray-700">Month Card Padding (X)</label>
+                            <span id="monthCardPadXValue" class="range-value">1.5rem</span>
+                        </div>
+                        <input type="range" id="monthCardPadXSlider" min="0.5" max="3" value="1.5" step="0.25" class="w-full">
+                    </div>
+                </div>
+                
+                <!-- Column 3: Sidebar -->
+                <div class="space-y-6 p-4 bg-gray-50 rounded-lg border">
+                    <h3 class="text-xl font-semibold border-b pb-2">Sidebar</h3>
+                    <!-- NEW: Sidebar Margin Top -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="sidebarMtSlider" class="block text-base font-medium text-gray-700">Margin Top</label>
+                            <span id="sidebarMtValue" class="range-value">0rem</span>
+                        </div>
+                        <input type="range" id="sidebarMtSlider" min="0" max="5" value="0" step="0.25" class="w-full">
+                    </div>
+                    <!-- NEW: Sidebar Margin Bottom -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="sidebarMbSlider" class="block text-base font-medium text-gray-700">Margin Bottom</label>
+                            <span id="sidebarMbValue" class="range-value">0rem</span>
+                        </div>
+                        <input type="range" id="sidebarMbSlider" min="0" max="5" value="0" step="0.25" class="w-full">
+                    </div>
+                    <!-- NEW: Sidebar Margin Left -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="sidebarMlSlider" class="block text-base font-medium text-gray-700">Margin Left</label>
+                            <span id="sidebarMlValue" class="range-value">0rem</span>
+                        </div>
+                        <input type="range" id="sidebarMlSlider" min="0" max="5" value="0" step="0.25" class="w-full">
+                    </div>
+                    <!-- NEW: Sidebar Margin Right -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="sidebarMrSlider" class="block text-base font-medium text-gray-700">Margin Right</label>
+                            <span id="sidebarMrValue" class="range-value">0rem</span>
+                        </div>
+                        <input type="range" id="sidebarMrSlider" min="0" max="5" value="0" step="0.25" class="w-full">
+                    </div>
+                    <!-- NEW: Sidebar Padding Y -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="sidebarPadYSlider" class="block text-base font-medium text-gray-700">Content Padding (Y)</label>
+                            <span id="sidebarPadYValue" class="range-value">1.5rem</span>
+                        </div>
+                        <input type="range" id="sidebarPadYSlider" min="0.5" max="3" value="1.5" step="0.25" class="w-full">
+                    </div>
+                    <!-- NEW: Sidebar Padding X -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="sidebarPadXSlider" class="block text-base font-medium text-gray-700">Content Padding (X)</label>
+                            <span id="sidebarPadXValue" class="range-value">1.5rem</span>
+                        </div>
+                        <input type="range" id="sidebarPadXSlider" min="0.5" max="3" value="1.5" step="0.25" class="w-full">
+                    </div>
                     <!-- Sidebar Title Font Size -->
                     <div class="space-y-2">
                         <div class="flex justify-between items-center">
-                            <label for="sidebarTitleFsSlider" class="block text-base font-medium text-gray-700">Sidebar Title Font</label>
+                            <label for="sidebarTitleFsSlider" class="block text-base font-medium text-gray-700">Title Font</label>
                             <span id="sidebarTitleFsValue" class="range-value">1.875rem</span>
                         </div>
-                        <input type="range" id="sidebarTitleFsSlider" min="1.25" max="2.5" value="1.875" step="0.125" class="w-full">
+                        <input type="range" id="sidebarTitleFsSlider" min="1.25" max="3" value="1.875" step="0.125" class="w-full"> <!-- Increased max -->
                     </div>
                     
                     <!-- Sidebar Body Font Size -->
                     <div class="space-y-2">
                         <div class="flex justify-between items-center">
-                            <label for="sidebarBodyFsSlider" class="block text-base font-medium text-gray-700">Sidebar Body Font</label>
+                            <label for="sidebarBodyFsSlider" class="block text-base font-medium text-gray-700">Body Font</label>
                             <span id="sidebarBodyFsValue" class="range-value">1rem</span>
                         </div>
                         <input type="range" id="sidebarBodyFsSlider" min="0.75" max="1.5" value="1" step="0.125" class="w-full"> <!-- Widened range -->
                     </div>
                 </div>
                 
-                <!-- Column 3: Paddings & Modals -->
+                <!-- Column 4: Modals (Pop-ups) -->
                 <div class="space-y-6 p-4 bg-gray-50 rounded-lg border">
-                    <h3 class="text-xl font-semibold border-b pb-2">Paddings & Modals</h3>
-                    <!-- NEW: Card Padding -->
+                    <h3 class="text-xl font-semibold border-b pb-2">Modals (Pop-ups)</h3>
+                    <!-- NEW: Modal Padding Y -->
                     <div class="space-y-2">
                         <div class="flex justify-between items-center">
-                            <label for="monthCardPadSlider" class="block text-base font-medium text-gray-700">Month Card Padding</label>
-                            <span id="monthCardPadValue" class="range-value">1.5rem</span>
+                            <label for="modalPadYSlider" class="block text-base font-medium text-gray-700">Padding (Y)</label>
+                            <span id="modalPadYValue" class="range-value">2rem</span>
                         </div>
-                        <input type="range" id="monthCardPadSlider" min="0.5" max="3" value="1.5" step="0.25" class="w-full">
+                        <input type="range" id="modalPadYSlider" min="1" max="4" value="2" step="0.25" class="w-full">
                     </div>
-                    
-                    <!-- NEW: Sidebar Padding -->
+                    <!-- NEW: Modal Padding X -->
                     <div class="space-y-2">
                         <div class="flex justify-between items-center">
-                            <label for="sidebarPadSlider" class="block text-base font-medium text-gray-700">Sidebar Padding</label>
-                            <span id="sidebarPadValue" class="range-value">1.5rem</span>
+                            <label for="modalPadXSlider" class="block text-base font-medium text-gray-700">Padding (X)</label>
+                            <span id="modalPadXValue" class="range-value">2rem</span>
                         </div>
-                        <input type="range" id="sidebarPadSlider" min="0.5" max="3" value="1.5" step="0.25" class="w-full">
-                    </div>
-                    
-                    <!-- NEW: Modal Padding -->
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center">
-                            <label for="modalPadSlider" class="block text-base font-medium text-gray-700">Modal (Pop-up) Padding</label>
-                            <span id="modalPadValue" class="range-value">2rem</span>
-                        </div>
-                        <input type="range" id="modalPadSlider" min="1" max="4" value="2" step="0.25" class="w-full">
+                        <input type="range" id="modalPadXSlider" min="1" max="4" value="2" step="0.25" class="w-full">
                     </div>
                     
                     <!-- Modal Title Font Size -->
                     <div class="space-y-2">
                         <div class="flex justify-between items-center">
-                            <label for="modalTitleFsSlider" class="block text-base font-medium text-gray-700">Modal Title Font</label>
+                            <label for="modalTitleFsSlider" class="block text-base font-medium text-gray-700">Title Font</label>
                             <span id="modalTitleFsValue" class="range-value">1.875rem</span>
                         </div>
-                        <input type="range" id="modalTitleFsSlider" min="1.25" max="2.5" value="1.875" step="0.125" class="w-full">
+                        <input type="range" id="modalTitleFsSlider" min="1.25" max="3" value="1.875" step="0.125" class="w-full"> <!-- Increased max -->
                     </div>
                     
                     <!-- Modal Body Font Size -->
                     <div class="space-y-2">
                         <div class="flex justify-between items-center">
-                            <label for="modalBodyFsSlider" class="block text-base font-medium text-gray-700">Modal Body Font</label>
+                            <label for="modalBodyFsSlider" class="block text-base font-medium text-gray-700">Body Font</label>
                             <span id="modalBodyFsValue" class="range-value">1rem</span>
                         </div>
                         <input type="range" id="modalBodyFsSlider" min="0.75" max="1.5" value="1" step="0.125" class="w-full"> <!-- Widened range -->
@@ -1083,12 +1155,28 @@
         const modalBodyFsSlider = document.getElementById('modalBodyFsSlider');
         const modalBodyFsValue = document.getElementById('modalBodyFsValue');
         // --- NEW Padding Sliders ---
-        const monthCardPadSlider = document.getElementById('monthCardPadSlider');
-        const monthCardPadValue = document.getElementById('monthCardPadValue');
-        const sidebarPadSlider = document.getElementById('sidebarPadSlider');
-        const sidebarPadValue = document.getElementById('sidebarPadValue');
-        const modalPadSlider = document.getElementById('modalPadSlider');
-        const modalPadValue = document.getElementById('modalPadValue');
+        const monthCardPadYSlider = document.getElementById('monthCardPadYSlider');
+        const monthCardPadYValue = document.getElementById('monthCardPadYValue');
+        const monthCardPadXSlider = document.getElementById('monthCardPadXSlider');
+        const monthCardPadXValue = document.getElementById('monthCardPadXValue');
+        const sidebarPadYSlider = document.getElementById('sidebarPadYSlider');
+        const sidebarPadYValue = document.getElementById('sidebarPadYValue');
+        const sidebarPadXSlider = document.getElementById('sidebarPadXSlider');
+        const sidebarPadXValue = document.getElementById('sidebarPadXValue');
+        const modalPadYSlider = document.getElementById('modalPadYSlider');
+        const modalPadYValue = document.getElementById('modalPadYValue');
+        const modalPadXSlider = document.getElementById('modalPadXSlider');
+        const modalPadXValue = document.getElementById('modalPadXValue');
+        // --- NEW Margin Sliders ---
+        const sidebarMtSlider = document.getElementById('sidebarMtSlider');
+        const sidebarMtValue = document.getElementById('sidebarMtValue');
+        const sidebarMbSlider = document.getElementById('sidebarMbSlider');
+        const sidebarMbValue = document.getElementById('sidebarMbValue');
+        const sidebarMlSlider = document.getElementById('sidebarMlSlider');
+        const sidebarMlValue = document.getElementById('sidebarMlValue');
+        const sidebarMrSlider = document.getElementById('sidebarMrSlider');
+        const sidebarMrValue = document.getElementById('sidebarMrValue');
+
 
         // --- NEW Analysis Modal Elements ---
         const manageAnalysisBtn = document.getElementById('manageAnalysisBtn');
@@ -1898,9 +1986,18 @@
             createSliderListener(modalTitleFsSlider, modalTitleFsValue, 'uiModalTitleFs', '--modal-title-fs', 'rem');
             createSliderListener(modalBodyFsSlider, modalBodyFsValue, 'uiModalBodyFs', '--modal-body-fs', 'rem');
             // --- NEW Padding Listeners ---
-            createSliderListener(monthCardPadSlider, monthCardPadValue, 'uiCardPad', '--card-padding', 'rem');
-            createSliderListener(sidebarPadSlider, sidebarPadValue, 'uiSidebarPad', '--sidebar-padding', 'rem');
-            createSliderListener(modalPadSlider, modalPadValue, 'uiModalPad', '--modal-padding', 'rem');
+            createSliderListener(monthCardPadYSlider, monthCardPadYValue, 'uiCardPadY', '--card-padding-y', 'rem');
+            createSliderListener(monthCardPadXSlider, monthCardPadXValue, 'uiCardPadX', '--card-padding-x', 'rem');
+            createSliderListener(sidebarPadYSlider, sidebarPadYValue, 'uiSidebarPadY', '--sidebar-padding-y', 'rem');
+            createSliderListener(sidebarPadXSlider, sidebarPadXValue, 'uiSidebarPadX', '--sidebar-padding-x', 'rem');
+            createSliderListener(modalPadYSlider, modalPadYValue, 'uiModalPadY', '--modal-padding-y', 'rem');
+            createSliderListener(modalPadXSlider, modalPadXValue, 'uiModalPadX', '--modal-padding-x', 'rem');
+            // --- NEW Margin Listeners ---
+            createSliderListener(sidebarMtSlider, sidebarMtValue, 'uiSidebarMt', '--sidebar-mt', 'rem');
+            createSliderListener(sidebarMbSlider, sidebarMbValue, 'uiSidebarMb', '--sidebar-mb', 'rem');
+            createSliderListener(sidebarMlSlider, sidebarMlValue, 'uiSidebarMl', '--sidebar-ml', 'rem');
+            createSliderListener(sidebarMrSlider, sidebarMrValue, 'uiSidebarMr', '--sidebar-mr', 'rem');
+
 
             uiResetBtn.addEventListener('click', () => {
                 // List of all settings [slider, storageKey, cssVar, defaultValue, unit]
@@ -1914,10 +2011,17 @@
                     [sidebarBodyFsSlider, 'uiSidebarBodyFs', '--sidebar-body-fs', 1, 'rem'],
                     [modalTitleFsSlider, 'uiModalTitleFs', '--modal-title-fs', 1.875, 'rem'],
                     [modalBodyFsSlider, 'uiModalBodyFs', '--modal-body-fs', 1, 'rem'],
-                    // --- NEW Padding Resets ---
-                    [monthCardPadSlider, 'uiCardPad', '--card-padding', 1.5, 'rem'],
-                    [sidebarPadSlider, 'uiSidebarPad', '--sidebar-padding', 1.5, 'rem'],
-                    [modalPadSlider, 'uiModalPad', '--modal-padding', 2, 'rem']
+                    // --- NEW Padding/Margin Resets ---
+                    [monthCardPadYSlider, 'uiCardPadY', '--card-padding-y', 1.5, 'rem'],
+                    [monthCardPadXSlider, 'uiCardPadX', '--card-padding-x', 1.5, 'rem'],
+                    [sidebarPadYSlider, 'uiSidebarPadY', '--sidebar-padding-y', 1.5, 'rem'],
+                    [sidebarPadXSlider, 'uiSidebarPadX', '--sidebar-padding-x', 1.5, 'rem'],
+                    [modalPadYSlider, 'uiModalPadY', '--modal-padding-y', 2, 'rem'],
+                    [modalPadXSlider, 'uiModalPadX', '--modal-padding-x', 2, 'rem'],
+                    [sidebarMtSlider, 'uiSidebarMt', '--sidebar-mt', 0, 'rem'],
+                    [sidebarMbSlider, 'uiSidebarMb', '--sidebar-mb', 0, 'rem'],
+                    [sidebarMlSlider, 'uiSidebarMl', '--sidebar-ml', 0, 'rem'],
+                    [sidebarMrSlider, 'uiSidebarMr', '--sidebar-mr', 0, 'rem'],
                 ];
                 
                 allSettings.forEach(([slider, key, cssVar, value, unit]) => {
@@ -1968,13 +2072,21 @@
                 [sidebarBodyFsSlider, 'uiSidebarBodyFs', '--sidebar-body-fs', 1, 'rem'],
                 [modalTitleFsSlider, 'uiModalTitleFs', '--modal-title-fs', 1.875, 'rem'],
                 [modalBodyFsSlider, 'uiModalBodyFs', '--modal-body-fs', 1, 'rem'],
-                // --- NEW Padding Loads ---
-                [monthCardPadSlider, 'uiCardPad', '--card-padding', 1.5, 'rem'],
-                [sidebarPadSlider, 'uiSidebarPad', '--sidebar-padding', 1.5, 'rem'],
-                [modalPadSlider, 'uiModalPad', '--modal-padding', 2, 'rem']
+                // --- NEW Padding/Margin Loads ---
+                [monthCardPadYSlider, 'uiCardPadY', '--card-padding-y', 1.5, 'rem'],
+                [monthCardPadXSlider, 'uiCardPadX', '--card-padding-x', 1.5, 'rem'],
+                [sidebarPadYSlider, 'uiSidebarPadY', '--sidebar-padding-y', 1.5, 'rem'],
+                [sidebarPadXSlider, 'uiSidebarPadX', '--sidebar-padding-x', 1.5, 'rem'],
+                [modalPadYSlider, 'uiModalPadY', '--modal-padding-y', 2, 'rem'],
+                [modalPadXSlider, 'uiModalPadX', '--modal-padding-x', 2, 'rem'],
+                [sidebarMtSlider, 'uiSidebarMt', '--sidebar-mt', 0, 'rem'],
+                [sidebarMbSlider, 'uiSidebarMb', '--sidebar-mb', 0, 'rem'],
+                [sidebarMlSlider, 'uiSidebarMl', '--sidebar-ml', 0, 'rem'],
+                [sidebarMrSlider, 'uiSidebarMr', '--sidebar-mr', 0, 'rem'],
             ];
             
             allSettings.forEach(([slider, key, cssVar, defaultValue, unit]) => {
+                if (!slider) return; // Guard against missing elements
                 const savedValue = localStorage.getItem(key) || defaultValue;
                 const displayValue = `${savedValue}${unit}`;
                 
