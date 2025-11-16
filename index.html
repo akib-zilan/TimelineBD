@@ -1650,6 +1650,9 @@
             activeTimelineId = timelineId;
             localStorage.setItem('activeTimelineId', timelineId);
 
+            // NEW: Re-render the modal list to reflect the new active timeline
+            renderTimelinesListInModal();
+
             // Detach old listeners
             detachDataListeners();
 
