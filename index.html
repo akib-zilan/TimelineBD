@@ -1142,9 +1142,6 @@ if (header) { // sidebarContent is already checked
 const headerHeight = header.offsetHeight;
 const stickyTopValue = `${headerHeight + 20}px`;
 
-// Set the scroll padding on the root element. This will be respected by scrollIntoView.
-document.documentElement.style.scrollPaddingTop = stickyTopValue;
-
 // 1. Update Sidebar
 if (sidebarContent) {
 sidebarContent.style.top = stickyTopValue;
@@ -2936,14 +2933,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedYear = yearJumpSelect.value;
         if (!selectedYear) return;
 
-        const yearElement = document.querySelector(`.year-block[data-year="${selectedYear}"]`);
+        // Target the non-sticky span inside the block for a more stable position reading
+        const yearElement = document.querySelector(`.year-block[data-year="${selectedYear}"] span`);
+        const headerElement = document.querySelector('header');
 
-        if (yearElement) {
-            // The scroll-padding-top is now set globally by the main script's updateStickyTop function.
-            // We can just call scrollIntoView and it will respect that padding.
-            yearElement.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
+        if (yearElement && headerElement) {
+            const headerHeight = headerElement.offsetHeight;
+            
+            // Calculate the absolute top position of the target year element
+            const elementTop = yearElement.getBoundingClientRect().top + window.scrollY;
+            
+            // Calculate the final scroll position.
+            // We subtract the header's height and an additional 20px for padding.
+            // We also subtract half the element's height to center it a bit more nicely.
+            const targetScrollPosition = elementTop - headerHeight - 20 - (yearElement.offsetHeight / 2);
+
+            window.scrollTo({
+                top: targetScrollPosition,
+                behavior: 'smooth'
             });
         }
     });
@@ -3029,3 +3036,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
+--- START OF FILE App.tsx ------ END OF FILE ---
