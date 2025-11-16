@@ -9,7 +9,8 @@
     <!-- Load Inter font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- UPDATED: Swapped to Noto Sans and Noto Sans Bengali for better font harmony -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Custom styles */
         
@@ -18,6 +19,7 @@
             /* Global */
             font-size: var(--global-scale, 100%); /* Controlled by JS */
             --main-gap: var(--layout-gap, 3rem); /* Controlled by JS - New Default */
+            --global-line-height: var(--line-height, 1.6); /* NEW: Controlled by JS */
             
             /* Timeline */
             --timeline-v-spacing: var(--month-spacing, 2rem); /* Controlled by JS */
@@ -43,8 +45,10 @@
         }
         
         body {
-            font-family: 'Inter', sans-serif;
+            /* UPDATED: Font family changed */
+            font-family: 'Noto Sans', 'Noto Sans Bengali', sans-serif;
             background-color: #f4f7f6; /* A very light, calming green-gray */
+            line-height: var(--global-line-height);
         }
         
         /* New Login Overlay */
@@ -96,6 +100,8 @@
              font-size: var(--timeline-year-fs);
              /* REMOVED sticky from here */
         }
+        
+        /* DELETED: year-observer-anchor (no longer needed) */
 
         /* Styling for each month's "dot" on the timeline */
         .timeline-dot {
@@ -400,42 +406,10 @@
         
         /* DELETED btn-delete-figure styles (moved to modal) */
         
-        /* NEW: Figure hover styles */
-        .figure-item .figure-description-tooltip {
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            margin-bottom: 0.75rem; /* mb-3 */
-            width: 12rem; /* w-48 */
-            padding: 0.75rem; /* p-3 */
-            background-color: #1f2937; /* bg-gray-900 */
-            color: white;
-            font-size: 0.875rem; /* text-sm */
-            border-radius: 0.5rem; /* rounded-lg */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.2s ease-in-out;
-            z-index: 60; /* NEW: Highest z-index */
-            pointer-events: none; /* Allow hover on image */
-        }
-        
-        .figure-item .figure-description-tooltip::after { /* Tooltip arrow */
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border-width: 8px;
-            border-style: solid;
-            border-color: #1f2937 transparent transparent transparent;
-        }
-        
-        .figure-item.group:hover .figure-description-tooltip {
-            opacity: 1;
-            visibility: visible;
-        }
+        /* DELETED: Figure hover styles. This is now handled by the global tooltip. */
+        /* .figure-item .figure-description-tooltip { ... } */
+        /* .figure-item .figure-description-tooltip::after { ... } */
+        /* .figure-item:hover .figure-description-tooltip { ... } */
         
         /* NEW: UI Modal styles */
         #uiModal label {
@@ -777,6 +751,15 @@
                         </div>
                         <input type="range" id="layoutGapSlider" min="2" max="15" value="3" step="0.5" class="w-full"> <!-- Increased max, new default -->
                     </div>
+                    
+                    <!-- NEW: Line Height -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="lineHeightSlider" class="block text-base font-medium text-gray-700">Global Line Height</label>
+                            <span id="lineHeightValue" class="range-value">1.6</span>
+                        </div>
+                        <input type="range" id="lineHeightSlider" min="1.2" max="2.2" value="1.6" step="0.1" class="w-full">
+                    </div>
                 </div>
                 
                 <!-- Column 2: Timeline -->
@@ -955,7 +938,7 @@
                         <label for="analysisFigureImageUrl" class="block text-base font-medium text-gray-700 mb-1">Image URL</label>
                         <input type="text" id="analysisFigureImageUrl" class="w-full p-3 text-base border border-gray-300 rounded-md" placeholder="https://... image link" required>
                         <!-- NEW: Image preview -->
-                        <img id="analysis-figure-preview" src="https://placehold.co/100x100?text=Preview" alt="preview" class="w-24 h-24 object-cover mt-2 rounded-md border">
+                        <img id="analysis-figure-preview" src="https://placehold.co/100x100?text=Preview" alt="preview" class="w-24 h-24 object-cover mt-2 rounded-md border" onerror="this.src='https://placehold.co/100x100/f87171/ffffff?text=Invalid+Link'">
                     </div>
                     <div class="col-span-1 md:col-span-2">
                         <label for="analysisFigureDescription" class="block text-base font-medium text-gray-700 mb-1">Description (for hover)</label>
@@ -985,6 +968,9 @@
             </div>
         </div>
     </dialog>
+
+    <!-- NEW: Global Tooltip -->
+    <div id="global-tooltip" class="fixed p-3 text-sm text-white bg-gray-900 rounded-lg shadow-lg z-[9999] opacity-0 transition-opacity duration-200 pointer-events-none" style="max-width: 200px; transform: translate(-50%, 12px);"></div>
 
 
     <!-- Firebase and App Logic -->
@@ -1054,6 +1040,9 @@
         let allSummaries = new Map(); // Map<year, summaryText>
         let allKeyFigures = []; // Array of figure objects
         let currentActiveYear = '1947'; // Default year
+        
+        // NEW: IntersectionObserver for sticky year
+        let yearObserver = null;
 
         // Constants
         const MONTHS = [
@@ -1140,6 +1129,10 @@
         const globalScaleValue = document.getElementById('globalScaleValue');
         const layoutGapSlider = document.getElementById('layoutGapSlider');
         const layoutGapValue = document.getElementById('layoutGapValue');
+        // NEW: Line Height
+        const lineHeightSlider = document.getElementById('lineHeightSlider');
+        const lineHeightValue = document.getElementById('lineHeightValue');
+        
         const verticalSpacingSlider = document.getElementById('verticalSpacingSlider');
         const verticalSpacingValue = document.getElementById('verticalSpacingValue');
         const yearHeaderFsSlider = document.getElementById('yearHeaderFsSlider');
@@ -1211,7 +1204,7 @@
                 }
                 analysisYearSelect.innerHTML = yearOptions;
 
-                // Render the static timeline structure
+                // Render the static HTML structure
                 renderTimelineStructure();
 
                 // Set up authentication
@@ -1241,6 +1234,9 @@
                 document.querySelectorAll('.year-block').forEach(block => { // Target the block
                     block.style.top = stickyTopValue; // Set top on the block
                 });
+                
+                // 3. NEW: Re-initialize the observer with the new stickyTopValue
+                observeYearHeaders(headerHeight + 20);
             }
         }
 
@@ -1367,6 +1363,7 @@
                 yearHeader.dataset.year = year; // <-- Important for IntersectionObserver
                 // RESTORED old logic with new, larger classes
                 yearHeader.innerHTML = ` 
+                    <!-- DELETED: Anchor for observer -->
                     <span class="relative z-10 inline-block px-8 py-3 bg-emerald-700 text-white font-bold rounded-lg shadow-lg">
                         ${year}
                     </span>
@@ -1405,7 +1402,7 @@
             populateContextDateDropdowns();
             
             // After rendering, set up the observer
-            observeYearHeaders();
+            // observeYearHeaders(); // REMOVED: Called by updateStickyTop now
         }
 
         /**
@@ -1832,16 +1829,13 @@
                 keyFiguresPlaceholder.style.display = 'none';
                 figuresForYear.forEach(fig => {
                     const figEl = document.createElement('div');
-                    figEl.className = 'figure-item relative group';
-                    // figEl.title = escapeHTML(fig.description); // REMOVED: Replaced with custom tooltip
+                    figEl.className = 'figure-item relative';
+                    figEl.dataset.description = escapeHTML(fig.description); // NEW: Add data attribute
                     
                     figEl.innerHTML = `
                         <img src="${escapeHTML(fig.imageUrl)}" alt="${escapeHTML(fig.name)}" class="w-full h-24 object-cover rounded-md border" onerror="this.src='https://placehold.co/100x100?text=Image'">
                         <p class="text-sm text-center font-medium truncate mt-1">${escapeHTML(fig.name)}</p>
-                        <!-- NEW: Custom Hover Tooltip -->
-                        <div class="figure-description-tooltip">
-                            ${escapeHTML(fig.description)}
-                        </div>
+                        <!-- DELETED: Inline tooltip div -->
                     `;
                     keyFiguresContainer.appendChild(figEl);
                 });
@@ -1963,12 +1957,31 @@
                 }
             });
             
-            // --- Sidebar Listeners (for delete) ---
-            keyFiguresContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('btn-delete-figure')) {
-                    // This button is no longer in the sidebar, but the listener is harmless.
-                    // Deletion is now handled by btn-delete-figure-modal in the analysis modal.
-                }
+            // --- UPDATED: Sidebar Listeners (for new tooltip) ---
+            const globalTooltip = document.getElementById('global-tooltip');
+
+            keyFiguresContainer.addEventListener('mouseover', (e) => {
+                const figureItem = e.target.closest('.figure-item');
+                if (!figureItem || !globalTooltip) return;
+
+                const description = figureItem.dataset.description;
+                if (!description) return;
+
+                // Populate and position the tooltip
+                globalTooltip.innerHTML = description;
+                const rect = figureItem.getBoundingClientRect();
+                
+                globalTooltip.style.left = `${rect.left + (rect.width / 2)}px`;
+                globalTooltip.style.top = `${rect.bottom}px`; // Positioned just below
+                globalTooltip.style.opacity = '1';
+            });
+
+            keyFiguresContainer.addEventListener('mouseout', (e) => {
+                const figureItem = e.target.closest('.figure-item');
+                if (!figureItem || !globalTooltip) return;
+
+                // Hide the tooltip
+                globalTooltip.style.opacity = '0';
             });
             
             // --- Figure Modal Listeners (Deprecated) ---
@@ -1986,10 +1999,10 @@
             uiModalClose.addEventListener('click', () => uiModal.close());
             
             // Helper to update a CSS var, localStorage, and a text display
-            const createSliderListener = (slider, valueDisplay, storageKey, cssVar, unit = '%') => {
+            const createSliderListener = (slider, valueDisplay, storageKey, cssVar, unit = '%', unitless = false) => { // NEW: unitless flag
                 slider.addEventListener('input', (e) => {
                     const value = e.target.value;
-                    const displayValue = `${value}${unit}`;
+                    const displayValue = unitless ? value : `${value}${unit}`;
                     document.documentElement.style.setProperty(cssVar, displayValue);
                     valueDisplay.textContent = displayValue;
                     localStorage.setItem(storageKey, value);
@@ -1999,6 +2012,7 @@
 
             createSliderListener(globalScaleSlider, globalScaleValue, 'uiScale', 'font-size', '%');
             createSliderListener(layoutGapSlider, layoutGapValue, 'uiGap', '--main-gap', 'rem');
+            createSliderListener(lineHeightSlider, lineHeightValue, 'uiLineHeight', '--global-line-height', '', true); // NEW
             createSliderListener(verticalSpacingSlider, verticalSpacingValue, 'uiSpacing', '--timeline-v-spacing', 'rem');
             createSliderListener(yearHeaderFsSlider, yearHeaderFsValue, 'uiYearHeaderFs', '--timeline-year-fs', 'rem');
             createSliderListener(monthCardFsSlider, monthCardFsValue, 'uiMonthCardFs', '--timeline-card-fs', 'rem');
@@ -2017,30 +2031,31 @@
 
 
             uiResetBtn.addEventListener('click', () => {
-                // List of all settings [slider, storageKey, cssVar, defaultValue, unit]
+                // List of all settings [slider, storageKey, cssVar, defaultValue, unit, unitless]
                 const allSettings = [
-                    [globalScaleSlider, 'uiScale', 'font-size', 100, '%'],
-                    [layoutGapSlider, 'uiGap', '--main-gap', 3, 'rem'], // New Default
-                    [verticalSpacingSlider, 'uiSpacing', '--timeline-v-spacing', 2, 'rem'],
-                    [yearHeaderFsSlider, 'uiYearHeaderFs', '--timeline-year-fs', 2.25, 'rem'],
-                    [monthCardFsSlider, 'uiMonthCardFs', '--timeline-card-fs', 1, 'rem'],
-                    [sidebarTitleFsSlider, 'uiSidebarTitleFs', '--sidebar-title-fs', 3.75, 'rem'], // 200% default
-                    [sidebarBodyFsSlider, 'uiSidebarBodyFs', '--sidebar-body-fs', 2, 'rem'], // 200% default
-                    [modalTitleFsSlider, 'uiModalTitleFs', '--modal-title-fs', 1.875, 'rem'],
-                    [modalBodyFsSlider, 'uiModalBodyFs', '--modal-body-fs', 1, 'rem'],
+                    [globalScaleSlider, 'uiScale', 'font-size', 100, '%', false],
+                    [layoutGapSlider, 'uiGap', '--main-gap', 3, 'rem', false], // New Default
+                    [lineHeightSlider, 'uiLineHeight', '--global-line-height', 1.6, '', true], // NEW
+                    [verticalSpacingSlider, 'uiSpacing', '--timeline-v-spacing', 2, 'rem', false],
+                    [yearHeaderFsSlider, 'uiYearHeaderFs', '--timeline-year-fs', 2.25, 'rem', false],
+                    [monthCardFsSlider, 'uiMonthCardFs', '--timeline-card-fs', 1, 'rem', false],
+                    [sidebarTitleFsSlider, 'uiSidebarTitleFs', '--sidebar-title-fs', 3.75, 'rem', false], // 200% default
+                    [sidebarBodyFsSlider, 'uiSidebarBodyFs', '--sidebar-body-fs', 2, 'rem', false], // 200% default
+                    [modalTitleFsSlider, 'uiModalTitleFs', '--modal-title-fs', 1.875, 'rem', false],
+                    [modalBodyFsSlider, 'uiModalBodyFs', '--modal-body-fs', 1, 'rem', false],
                     // --- NEW Padding/Margin Resets ---
-                    [monthCardPadYSlider, 'uiCardPadY', '--card-padding-y', 1.5, 'rem'],
-                    [monthCardPadXSlider, 'uiCardPadX', '--card-padding-x', 1.5, 'rem'],
-                    [sidebarPadYSlider, 'uiSidebarPadY', '--sidebar-padding-y', 1.5, 'rem'],
-                    [sidebarPadXSlider, 'uiSidebarPadX', '--sidebar-padding-x', 1.5, 'rem'],
-                    [modalPadYSlider, 'uiModalPadY', '--modal-padding-y', 2, 'rem'],
-                    [modalPadXSlider, 'uiModalPadX', '--modal-padding-x', 2, 'rem'],
+                    [monthCardPadYSlider, 'uiCardPadY', '--card-padding-y', 1.5, 'rem', false],
+                    [monthCardPadXSlider, 'uiCardPadX', '--card-padding-x', 1.5, 'rem', false],
+                    [sidebarPadYSlider, 'uiSidebarPadY', '--sidebar-padding-y', 1.5, 'rem', false],
+                    [sidebarPadXSlider, 'uiSidebarPadX', '--sidebar-padding-x', 1.5, 'rem', false],
+                    [modalPadYSlider, 'uiModalPadY', '--modal-padding-y', 2, 'rem', false],
+                    [modalPadXSlider, 'uiModalPadX', '--modal-padding-x', 2, 'rem', false],
                     // --- DELETED Margin Resets ---
                 ];
                 
-                allSettings.forEach(([slider, key, cssVar, value, unit]) => {
+                allSettings.forEach(([slider, key, cssVar, value, unit, unitless]) => {
                     localStorage.removeItem(key);
-                    const displayValue = `${value}${unit}`;
+                    const displayValue = unitless ? value : `${value}${unit}`;
                     document.documentElement.style.setProperty(cssVar, displayValue);
                     slider.value = value;
                     // Find the corresponding value display element
@@ -2083,31 +2098,32 @@
          * NEW: Loads and applies UI settings from localStorage
          */
         function loadUiSettings() {
-             // List of all settings [slider, storageKey, cssVar, defaultValue, unit]
+             // List of all settings [slider, storageKey, cssVar, defaultValue, unit, unitless]
             const allSettings = [
-                [globalScaleSlider, 'uiScale', 'font-size', 100, '%'],
-                [layoutGapSlider, 'uiGap', '--main-gap', 3, 'rem'], // New Default
-                [verticalSpacingSlider, 'uiSpacing', '--timeline-v-spacing', 2, 'rem'],
-                [yearHeaderFsSlider, 'uiYearHeaderFs', '--timeline-year-fs', 2.25, 'rem'],
-                [monthCardFsSlider, 'uiMonthCardFs', '--timeline-card-fs', 1, 'rem'],
-                [sidebarTitleFsSlider, 'uiSidebarTitleFs', '--sidebar-title-fs', 3.75, 'rem'], // 200% default
-                [sidebarBodyFsSlider, 'uiSidebarBodyFs', '--sidebar-body-fs', 2, 'rem'], // 200% default
-                [modalTitleFsSlider, 'uiModalTitleFs', '--modal-title-fs', 1.875, 'rem'],
-                [modalBodyFsSlider, 'uiModalBodyFs', '--modal-body-fs', 1, 'rem'],
+                [globalScaleSlider, 'uiScale', 'font-size', 100, '%', false],
+                [layoutGapSlider, 'uiGap', '--main-gap', 3, 'rem', false], // New Default
+                [lineHeightSlider, 'uiLineHeight', '--global-line-height', 1.6, '', true], // NEW
+                [verticalSpacingSlider, 'uiSpacing', '--timeline-v-spacing', 2, 'rem', false],
+                [yearHeaderFsSlider, 'uiYearHeaderFs', '--timeline-year-fs', 2.25, 'rem', false],
+                [monthCardFsSlider, 'uiMonthCardFs', '--timeline-card-fs', 1, 'rem', false],
+                [sidebarTitleFsSlider, 'uiSidebarTitleFs', '--sidebar-title-fs', 3.75, 'rem', false], // 200% default
+                [sidebarBodyFsSlider, 'uiSidebarBodyFs', '--sidebar-body-fs', 2, 'rem', false], // 200% default
+                [modalTitleFsSlider, 'uiModalTitleFs', '--modal-title-fs', 1.875, 'rem', false],
+                [modalBodyFsSlider, 'uiModalBodyFs', '--modal-body-fs', 1, 'rem', false],
                 // --- NEW Padding/Margin Loads ---
-                [monthCardPadYSlider, 'uiCardPadY', '--card-padding-y', 1.5, 'rem'],
-                [monthCardPadXSlider, 'uiCardPadX', '--card-padding-x', 1.5, 'rem'],
-                [sidebarPadYSlider, 'uiSidebarPadY', '--sidebar-padding-y', 1.5, 'rem'],
-                [sidebarPadXSlider, 'uiSidebarPadX', '--sidebar-padding-x', 1.5, 'rem'],
-                [modalPadYSlider, 'uiModalPadY', '--modal-padding-y', 2, 'rem'],
-                [modalPadXSlider, 'uiModalPadX', '--modal-padding-x', 2, 'rem'],
+                [monthCardPadYSlider, 'uiCardPadY', '--card-padding-y', 1.5, 'rem', false],
+                [monthCardPadXSlider, 'uiCardPadX', '--card-padding-x', 1.5, 'rem', false],
+                [sidebarPadYSlider, 'uiSidebarPadY', '--sidebar-padding-y', 1.5, 'rem', false],
+                [sidebarPadXSlider, 'uiSidebarPadX', '--sidebar-padding-x', 1.5, 'rem', false],
+                [modalPadYSlider, 'uiModalPadY', '--modal-padding-y', 2, 'rem', false],
+                [modalPadXSlider, 'uiModalPadX', '--modal-padding-x', 2, 'rem', false],
                 // --- DELETED Margin Loads ---
             ];
             
-            allSettings.forEach(([slider, key, cssVar, defaultValue, unit]) => {
+            allSettings.forEach(([slider, key, cssVar, defaultValue, unit, unitless]) => {
                 if (!slider) return; // Guard against missing elements
                 const savedValue = localStorage.getItem(key) || defaultValue;
-                const displayValue = `${savedValue}${unit}`;
+                const displayValue = unitless ? savedValue : `${savedValue}${unit}`;
                 
                 document.documentElement.style.setProperty(cssVar, displayValue);
                 slider.value = savedValue;
@@ -2122,17 +2138,21 @@
         /**
          * Sets up the IntersectionObserver to watch year headers.
          */
-        function observeYearHeaders() {
+        function observeYearHeaders(stickyTopPx = 180) { // NEW: Accepts dynamic top value
+            if (yearObserver) yearObserver.disconnect(); // Disconnect old observer
+            
+            // NEW: Observe the year-block itself, not an anchor
+            // Trigger when the top of the block hits the sticky line
             const observerOptions = {
                 root: null, // viewport
-                rootMargin: '-50% 0px -50% 0px', // Triggers when the header is in the middle of the screen
+                rootMargin: `-${stickyTopPx}px 0px -${window.innerHeight - stickyTopPx - 1}px 0px`,
                 threshold: 0
             };
             
-            const observer = new IntersectionObserver((entries) => {
+            yearObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        const year = entry.target.dataset.year;
+                        const year = entry.target.dataset.year; 
                         if (year && year !== currentActiveYear) {
                             currentActiveYear = year;
                             updateSidebarContent(year);
@@ -2141,8 +2161,9 @@
                 });
             }, observerOptions);
 
-            document.querySelectorAll('.year-block').forEach(header => {
-                observer.observe(header);
+            // NEW: Observe the .year-block elements
+            document.querySelectorAll('.year-block').forEach(block => {
+                yearObserver.observe(block);
             });
         }
         
