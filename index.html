@@ -30,6 +30,10 @@
             align-items: center;
             z-index: 100;
         }
+        
+        #login-overlay h1 { font-size: 2.25rem; /* text-4xl */ }
+        #login-overlay p { font-size: 1.25rem; /* text-xl */ }
+        #login-overlay button { font-size: 1.125rem; /* text-lg */ padding: 1rem 2rem; }
 
         /* Hide main content by default */
         .main-app-content {
@@ -43,7 +47,7 @@
             top: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 4px;
+            width: 6px; /* Increased */
             height: 100%;
             background-color: #cbd5e1; /* slate-300 */
             z-index: 2; 
@@ -52,19 +56,19 @@
         /* Styling for each year block */
         .year-block {
             position: relative;
-            padding: 2rem 0;
+            padding: 2.5rem 0; /* Increased */
         }
 
         /* Styling for each month's "dot" on the timeline */
         .timeline-dot {
             position: absolute;
-            top: 0.875rem; /* Aligns with the center of the month name */
+            top: 1.125rem; /* Adjusted for larger text */
             left: 50%;
             transform: translateX(-50%);
-            width: 20px;
-            height: 20px;
+            width: 24px; /* Increased */
+            height: 24px; /* Increased */
             background-color: white;
-            border: 4px solid #059669; /* emerald-600 */
+            border: 5px solid #059669; /* Increased */
             border-radius: 50%;
             z-index: 5; 
             transition: all 0.3s ease;
@@ -79,20 +83,20 @@
         .month-item {
             position: relative;
             width: 50%;
-            padding: 0 2.5rem; /* 40px */
-            margin-bottom: 1.5rem; /* 24px */
+            padding: 0 3rem; /* Increased */
+            margin-bottom: 2rem; /* Increased */
         }
 
         /* Even items on the right */
         .month-item:nth-child(even) {
             align-self: flex-end;
-            padding-left: 2.5rem;
+            padding-left: 3rem; /* Increased */
         }
         
         /* Odd items on the left */
         .month-item:nth-child(odd) {
             align-self: flex-start;
-            padding-right: 2.5rem;
+            padding-right: 3rem; /* Increased */
             text-align: right;
         }
 
@@ -109,9 +113,9 @@
         .month-item::after {
             content: '';
             position: absolute;
-            top: 1.125rem; /* 18px */
-            width: 2.5rem; /* 40px */
-            height: 2px;
+            top: 1.375rem; /* Adjusted for dot */
+            width: 3rem; /* Increased */
+            height: 3px; /* Increased */
             background: #cbd5e1; /* slate-300 */
             z-index: 2; 
         }
@@ -159,9 +163,9 @@
         /* Style for the duration span bars */
         .duration-span {
             position: absolute;
-            left: calc(50% - 2px); 
+            left: calc(50% - 3px); /* Adjusted */
             transform: translateX(-100%); 
-            width: 6px; 
+            width: 8px; /* Increased */
             z-index: 3; 
             opacity: 0.8;
             transition: all 0.3s ease;
@@ -174,8 +178,8 @@
             position: absolute;
             left: 50%; 
             transform: translateX(-50%); 
-            width: 12px; 
-            height: 6px; 
+            width: 16px; /* Increased */
+            height: 8px; /* Increased */
             background-color: inherit; 
             z-index: 4; 
         }
@@ -191,8 +195,8 @@
         /* Color preview in modal */
         #colorPreview {
             display: inline-block;
-            width: 24px;
-            height: 24px;
+            width: 28px; /* Increased */
+            height: 28px; /* Increased */
             border-radius: 50%;
             border: 1px solid #ccc;
             vertical-align: middle;
@@ -219,7 +223,7 @@
             position: absolute;
             top: 0;
             height: 100%;
-            width: 10px; /* Width of each role's bar */
+            width: 12px; /* Increased */
             z-index: 1; 
             background-color: rgba(200, 200, 200, 0.2);
             border-radius: 5px;
@@ -244,7 +248,7 @@
             writing-mode: vertical-rl;
             transform: rotate(180deg) translateX(100%) translateY(5px);
             transform-origin: bottom right;
-            font-size: 0.75rem; /* 12px */
+            font-size: 0.875rem; /* text-sm */
             font-weight: 600;
             color: #555;
             padding-bottom: 5px;
@@ -259,12 +263,13 @@
             space-y: 1;
         }
         .month-content ul li {
-            padding: 8px 12px;
+            padding: 12px 16px; /* Increased */
             background-color: #f8fafc;
             border-radius: 6px;
             border: 1px solid #e2e8f0;
             text-align: left; /* Ensure list items are left-aligned */
-            margin-bottom: 6px;
+            margin-bottom: 8px; /* Increased */
+            font-size: 1rem; /* text-base */
         }
         .month-content ul li:last-child {
             margin-bottom: 0;
@@ -277,13 +282,14 @@
         .note-day {
             font-weight: 700;
             color: #059669; /* emerald-600 */
+            font-size: 1rem; /* text-base */
         }
         .note-tag {
-            font-size: 0.75rem; /* 12px */
+            font-size: 0.875rem; /* text-sm */
             font-weight: 500;
             color: #4338ca; /* indigo-700 */
             background-color: #e0e7ff; /* indigo-100 */
-            padding: 2px 6px;
+            padding: 3px 8px; /* Increased */
             border-radius: 4px;
             margin-left: 8px;
         }
@@ -292,7 +298,7 @@
         #sidebar-content {
             /* top-32 (128px) to be below sticky header */
             position: sticky;
-            top: 150px; 
+            top: 180px; /* Increased */
         }
         
         #key-figures-container {
@@ -303,13 +309,13 @@
         .figure-item .btn-delete-figure {
             display: none;
             position: absolute;
-            top: -4px;
-            right: -4px;
-            width: 20px;
-            height: 20px;
-            line-height: 20px;
+            top: -6px; /* Adjusted */
+            right: -6px; /* Adjusted */
+            width: 24px; /* Increased */
+            height: 24px; /* Increased */
+            line-height: 24px; /* Increased */
             text-align: center;
-            font-size: 10px;
+            font-size: 12px; /* Increased */
             font-weight: bold;
             border-radius: 50%;
             cursor: pointer;
@@ -325,9 +331,9 @@
     <!-- New Login Screen -->
     <div id="login-overlay">
         <div class="text-center p-8 bg-white shadow-xl rounded-lg">
-            <h1 class="text-3xl font-bold text-emerald-700">BCS History Timeline</h1>
-            <p class="text-lg text-gray-600 my-4">Please sign in to access your personal study timeline.</p>
-            <button id="login-btn" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors">
+            <h1 class="text-4xl font-bold text-emerald-700">BCS History Timeline</h1>
+            <p class="text-xl text-gray-600 my-4">Please sign in to access your personal study timeline.</p>
+            <button id="login-btn" class="px-8 py-4 text-lg bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors">
                 Sign in with Google
             </button>
         </div>
@@ -336,22 +342,22 @@
     <!-- Main App Content (hidden by default) -->
     <div class="main-app-content">
         <!-- Header -->
-        <header class="bg-white shadow-md p-6 sticky top-0 z-50">
+        <header class="bg-white shadow-md p-8 sticky top-0 z-50"> <!-- Increased padding -->
             <!-- Increased max-width to max-w-7xl -->
             <div class="container mx-auto max-w-7xl">
-                <h1 class="text-3xl font-bold text-emerald-700">BCS History Timeline</h1>
-                <p class="text-lg text-gray-600">Focus: 1947 - 1951</p>
+                <h1 class="text-4xl font-bold text-emerald-700">BCS History Timeline</h1> <!-- Increased size -->
+                <p class="text-xl text-gray-600">Focus: 1947 - 1951</p> <!-- Increased size -->
                 
                 <div class="flex items-center justify-between mt-4">
-                    <div id="userInfo" class="text-xs text-gray-500 mt-2">Connecting...</div>
+                    <div id="userInfo" class="text-sm text-gray-500 mt-2">Connecting...</div> <!-- Increased size -->
                     <div class="flex items-center space-x-4">
                         <!-- New Manage Context Button -->
-                        <button id="manageContextBtn" class="px-3 py-1 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700 transition-colors">
+                        <button id="manageContextBtn" class="px-4 py-2 bg-gray-600 text-white text-base font-medium rounded-md hover:bg-gray-700 transition-colors"> <!-- Increased size -->
                             Manage Context
                         </button>
                         <!-- New Context Toggle -->
                         <div class="flex items-center space-x-2">
-                            <span class="text-sm font-medium text-gray-700">Context</span>
+                            <span class="text-base font-medium text-gray-700">Context</span> <!-- Increased size -->
                             <label for="contextToggle" class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="contextToggle" class="sr-only peer">
                                 <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 peer-checked:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
@@ -359,27 +365,27 @@
                         </div>
                         <!-- Existing Compact Toggle -->
                         <div class="flex items-center space-x-2">
-                            <span class="text-sm font-medium text-gray-700">Compact</span>
+                            <span class="text-base font-medium text-gray-700">Compact</span> <!-- Increased size -->
                             <label for="compactToggle" class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="compactToggle" class="sr-only peer">
                                 <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 peer-checked:bg-emerald-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
                             </label>
                         </div>
                         <!-- New Sign Out Button -->
-                         <button id="sign-out-btn" class="px-3 py-1 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors">
+                         <button id="sign-out-btn" class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md hover:bg-red-700 transition-colors"> <!-- Increased size -->
                             Sign Out
                         </button>
                     </div>
                 </div>
                 <!-- New Tag Filter Bar -->
                 <div class="mt-4">
-                    <input type="text" id="tagFilter" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Filter by tag (e.g., politics)...">
+                    <input type="text" id="tagFilter" class="w-full p-3 text-base border border-gray-300 rounded-md" placeholder="Filter by tag (e.g., politics)..."> <!-- Increased size -->
                 </div>
             </div>
         </header>
 
         <!-- Main Content - Changed to Grid Layout -->
-        <main class="container mx-auto max-w-7xl py-12 px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <main class="container mx-auto max-w-7xl py-16 px-6 grid grid-cols-1 lg:grid-cols-3 gap-12"> <!-- Increased padding/gap -->
             
             <!-- Column 1: Timeline -->
             <div class="lg:col-span-2">
@@ -394,14 +400,14 @@
 
             <!-- Column 2: New Sidebar -->
             <aside id="sidebar" class="lg:col-span-1 relative">
-                <div id="sidebar-content" class="sticky top-[160px] p-4 bg-white shadow-lg rounded-lg border border-gray-200">
-                    <h2 class="text-2xl font-bold mb-4">Analysis for <span id="sidebar-year">1947</span></h2>
+                <div id="sidebar-content" class="sticky top-[180px] p-6 bg-white shadow-lg rounded-lg border border-gray-200"> <!-- Increased padding -->
+                    <h2 class="text-3xl font-bold mb-4">Analysis for <span id="sidebar-year">1947</span></h2> <!-- Increased size -->
             
                     <!-- Summary Box -->
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-700">My Summary & Analysis</h3>
-                        <textarea id="summary-textarea" class="w-full h-40 p-2 border rounded-md mt-2 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Your 'big picture' analysis for this year..."></textarea>
-                        <button id="save-summary-btn" class="mt-2 px-4 py-1 bg-emerald-600 text-white rounded-md text-sm hover:bg-emerald-700 transition-colors">
+                        <h3 class="text-xl font-semibold text-gray-700">My Summary & Analysis</h3> <!-- Increased size -->
+                        <textarea id="summary-textarea" class="w-full h-48 p-3 text-base border rounded-md mt-2 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Your 'big picture' analysis for this year..."></textarea> <!-- Increased size -->
+                        <button id="save-summary-btn" class="mt-2 px-5 py-2 bg-emerald-600 text-white text-base rounded-md hover:bg-emerald-700 transition-colors"> <!-- Increased size -->
                             Save Summary
                         </button>
                     </div>
@@ -409,12 +415,12 @@
                     <!-- Key Figures Box -->
                     <div class="mt-6">
                         <div class="flex justify-between items-center">
-                            <h3 class="text-lg font-semibold text-gray-700">Key Figures</h3>
-                            <button id="add-figure-btn" class="px-3 py-1 bg-gray-600 text-white text-sm rounded-full font-bold hover:bg-gray-700">+</button>
+                            <h3 class="text-xl font-semibold text-gray-700">Key Figures</h3> <!-- Increased size -->
+                            <button id="add-figure-btn" class="px-4 py-2 bg-gray-600 text-white text-base rounded-full font-bold hover:bg-gray-700">+</button> <!-- Increased size -->
                         </div>
                         <div id="key-figures-container" class="mt-2 grid grid-cols-3 gap-2 p-2 bg-gray-50 rounded-md border">
                             <!-- Figures will be injected here -->
-                            <p id="key-figures-placeholder" class="text-sm text-gray-500 italic col-span-3">No figures added for this year.</p>
+                            <p id="key-figures-placeholder" class="text-base text-gray-500 italic col-span-3">No figures added for this year.</p> <!-- Increased size -->
                         </div>
                     </div>
                 </div>
@@ -422,18 +428,18 @@
         </main>
         
         <!-- Footer -->
-        <footer class="text-center p-6 text-gray-500 text-sm">
+        <footer class="text-center p-8 text-base text-gray-500"> <!-- Increased size -->
             A study tool crafted for your success.
         </footer>
     </div> <!-- End .main-app-content -->
 
 
     <!-- Info Modal Dialog -->
-    <dialog id="infoModal" class="p-0 rounded-lg shadow-xl w-full max-w-lg">
-        <form id="infoForm" class="p-6 space-y-4">
+    <dialog id="infoModal" class="p-0 rounded-lg shadow-xl w-full max-w-xl"> <!-- Increased size -->
+        <form id="infoForm" class="p-8 space-y-6"> <!-- Increased padding/spacing -->
             <div>
-                <h2 class="text-2xl font-semibold" id="modalTitle">Add Information</h2>
-                <p class="text-md text-gray-600" id="modalSubTitle">Year 1947, January</p>
+                <h2 class="text-3xl font-semibold" id="modalTitle">Add Information</h2> <!-- Increased size -->
+                <p class="text-lg text-gray-600" id="modalSubTitle">Year 1947, January</p> <!-- Increased size -->
             </div>
             
             <!-- Hidden fields -->
@@ -443,24 +449,24 @@
             
             <!-- New Note Management Area -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Notes:</label>
+                <label class="block text-base font-medium text-gray-700 mb-2">Notes:</label> <!-- Increased size -->
                 <!-- Container for dynamic note entries -->
-                <div id="notesContainer" class="space-y-3 max-h-60 overflow-y-auto p-2 border rounded-md bg-gray-50">
+                <div id="notesContainer" class="space-y-4 max-h-60 overflow-y-auto p-3 border rounded-md bg-gray-50"> <!-- Increased spacing -->
                     <!-- Note entries will be dynamically added here -->
                 </div>
                 <!-- Add Note Button -->
-                <button type="button" id="addNoteEntry" class="mt-3 w-full px-4 py-2 bg-emerald-100 text-emerald-700 text-sm font-medium rounded-md hover:bg-emerald-200 transition-colors">
+                <button type="button" id="addNoteEntry" class="mt-3 w-full px-4 py-3 bg-emerald-100 text-emerald-700 text-base font-medium rounded-md hover:bg-emerald-200 transition-colors"> <!-- Increased size -->
                     + Add Note
                 </button>
             </div>
 
             <!-- Duration Event Fields -->
-            <div class="p-4 bg-gray-50 rounded-md border border-gray-200 space-y-3">
-                <h3 class="font-medium text-gray-800">Event Duration (Optional)</h3>
-                <p class="text-sm text-gray-500">Use this to mark a multi-month event, like a war. This is separate from the notes above.</p>
+            <div class="p-5 bg-gray-50 rounded-md border border-gray-200 space-y-4"> <!-- Increased padding/spacing -->
+                <h3 class="font-medium text-lg">Event Duration (Optional)</h3> <!-- Increased size -->
+                <p class="text-base text-gray-500">Use this to mark a multi-month event, like a war. This is separate from the notes above.</p> <!-- Increased size -->
                 <div>
-                    <label for="modalEventType" class="block text-sm font-medium text-gray-700 mb-1">Type:</label>
-                    <select id="modalEventType" class="w-full p-2 border border-gray-300 rounded-md">
+                    <label for="modalEventType" class="block text-base font-medium text-gray-700 mb-1">Type:</label> <!-- Increased size -->
+                    <select id="modalEventType" class="w-full p-3 text-base border border-gray-300 rounded-md"> <!-- Increased size -->
                         <option value="single" selected>Not a duration event</option>
                         <option value="start">Start of Event</option>
                         <option value="end">End of Event</option>
@@ -468,28 +474,28 @@
                 </div>
                 
                 <!-- Fields shown for start/end -->
-                <div id="modalDurationFields" class="hidden space-y-3">
+                <div id="modalDurationFields" class="hidden space-y-4"> <!-- Increased spacing -->
                     <div>
-                        <label for="modalEventTitle" class="block text-sm font-medium text-gray-700 mb-1">
+                        <label for="modalEventTitle" class="block text-base font-medium text-gray-700 mb-1"> <!-- Increased size -->
                             Event Title (must be identical for start and end)
                         </label>
-                        <input type="text" id="modalEventTitle" class="w-full p-2 border border-gray-300 rounded-md" placeholder="e.g., Language Movement">
+                        <input type="text" id="modalEventTitle" class="w-full p-3 text-base border border-gray-300 rounded-md" placeholder="e.g., Language Movement"> <!-- Increased size -->
                     </div>
                     
                     <!-- Color picker (only for 'start') -->
                     <div id="modalEventColorWrapper">
-                        <label for="modalEventColor" class="inline-block text-sm font-medium text-gray-700 mb-1">Event Color:</label>
-                        <input type="color" id="modalEventColor" class="w-12 h-8 p-1 border border-gray-300 rounded-md align-middle" value="#3b82f6">
+                        <label for="modalEventColor" class="inline-block text-base font-medium text-gray-700 mb-1">Event Color:</label> <!-- Increased size -->
+                        <input type="color" id="modalEventColor" class="w-12 h-10 p-1 border border-gray-300 rounded-md align-middle" value="#3b82f6"> <!-- Increased size -->
                         <span id="colorPreview" style="background-color: #3b82f6;"></span>
                     </div>
                 </div>
             </div>
             
             <div class="mt-6 flex justify-end space-x-3">
-                <button type="button" id="modalCancel" class="px-5 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors">
+                <button type="button" id="modalCancel" class="px-6 py-3 text-base bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"> <!-- Increased size -->
                     Cancel
                 </button>
-                <button type="submit" id="modalSave" class="px-5 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors">
+                <button type="submit" id="modalSave" class="px-6 py-3 text-base bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors"> <!-- Increased size -->
                     Save
                 </button>
             </div>
@@ -497,70 +503,70 @@
     </dialog>
 
     <!-- Context Modal Dialog -->
-    <dialog id="contextModal" class="p-0 rounded-lg shadow-xl w-full max-w-2xl">
-        <div class="p-6">
-            <h2 class="text-2xl font-semibold">Manage Political Context</h2>
-            <p class="text-md text-gray-600">Add or remove governing eras. These will be shown as vertical bars on the timeline.</p>
+    <dialog id="contextModal" class="p-0 rounded-lg shadow-xl w-full max-w-3xl"> <!-- Increased size -->
+        <div class="p-8"> <!-- Increased padding -->
+            <h2 class="text-3xl font-semibold">Manage Political Context</h2> <!-- Increased size -->
+            <p class="text-lg text-gray-600">Add or remove governing eras. These will be shown as vertical bars on the timeline.</p> <!-- Increased size -->
             
             <!-- Form for adding new context -->
-            <form id="contextForm" class="mt-6 p-4 border border-gray-200 rounded-lg bg-gray-50 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <h3 class="text-lg font-medium col-span-1 md:col-span-2">Add New Era</h3>
+            <form id="contextForm" class="mt-6 p-6 border border-gray-200 rounded-lg bg-gray-50 grid grid-cols-1 md:grid-cols-2 gap-6"> <!-- Increased padding/gap -->
+                <h3 class="text-xl font-medium col-span-1 md:col-span-2">Add New Era</h3> <!-- Increased size -->
                 <div>
-                    <label for="contextRole" class="block text-sm font-medium text-gray-700 mb-1">Role / Title</label>
-                    <input type="text" id="contextRole" class="w-full p-2 border border-gray-300 rounded-md" placeholder="e.g., Governor-General" required>
+                    <label for="contextRole" class="block text-base font-medium text-gray-700 mb-1">Role / Title</label> <!-- Increased size -->
+                    <input type="text" id="contextRole" class="w-full p-3 text-base border border-gray-300 rounded-md" placeholder="e.g., Governor-General" required> <!-- Increased size -->
                 </div>
                 <div>
-                    <label for="contextName" class="block text-sm font-medium text-gray-700 mb-1">Person / Party Name</label>
-                    <input type="text" id="contextName" class="w-full p-2 border border-gray-300 rounded-md" placeholder="e.g., Khawaja Nazimuddin" required>
+                    <label for="contextName" class="block text-base font-medium text-gray-700 mb-1">Person / Party Name</label> <!-- Increased size -->
+                    <input type="text" id="contextName" class="w-full p-3 text-base border border-gray-300 rounded-md" placeholder="e.g., Khawaja Nazimuddin" required> <!-- Increased size -->
                 </div>
                 <!-- Start Date -->
-                <div class="grid grid-cols-3 gap-2">
+                <div class="grid grid-cols-3 gap-3"> <!-- Increased gap -->
                     <div>
-                        <label for="contextStartYear" class="block text-sm font-medium text-gray-700 mb-1">Start Year</label>
-                        <select id="contextStartYear" class="w-full p-2 border border-gray-300 rounded-md" required>
+                        <label for="contextStartYear" class="block text-base font-medium text-gray-700 mb-1">Start Year</label> <!-- Increased size -->
+                        <select id="contextStartYear" class="w-full p-3 text-base border border-gray-300 rounded-md" required> <!-- Increased size -->
                             <!-- Options will be populated by JS -->
                         </select>
                     </div>
                     <div>
-                        <label for="contextStartMonth" class="block text-sm font-medium text-gray-700 mb-1">Start Month</label>
-                        <select id="contextStartMonth" class="w-full p-2 border border-gray-300 rounded-md" required>
+                        <label for="contextStartMonth" class="block text-base font-medium text-gray-700 mb-1">Start Month</label> <!-- Increased size -->
+                        <select id="contextStartMonth" class="w-full p-3 text-base border border-gray-300 rounded-md" required> <!-- Increased size -->
                             <!-- Options will be populated by JS -->
                         </select>
                     </div>
                     <div>
-                        <label for="contextStartDay" class="block text-sm font-medium text-gray-700 mb-1">Start Day</label>
-                        <select id="contextStartDay" class="w-full p-2 border border-gray-300 rounded-md" required>
+                        <label for="contextStartDay" class="block text-base font-medium text-gray-700 mb-1">Start Day</label> <!-- Increased size -->
+                        <select id="contextStartDay" class="w-full p-3 text-base border border-gray-300 rounded-md" required> <!-- Increased size -->
                             <!-- Options will be populated by JS -->
                         </select>
                     </div>
                 </div>
                 <!-- End Date -->
-                <div class="grid grid-cols-3 gap-2">
+                <div class="grid grid-cols-3 gap-3"> <!-- Increased gap -->
                     <div>
-                        <label for="contextEndYear" class="block text-sm font-medium text-gray-700 mb-1">End Year</label>
-                        <select id="contextEndYear" class="w-full p-2 border border-gray-300 rounded-md" required>
+                        <label for="contextEndYear" class="block text-base font-medium text-gray-700 mb-1">End Year</label> <!-- Increased size -->
+                        <select id="contextEndYear" class="w-full p-3 text-base border border-gray-300 rounded-md" required> <!-- Increased size -->
                             <!-- Options will be populated by JS -->
                         </select>
                     </div>
                     <div>
-                        <label for="contextEndMonth" class="block text-sm font-medium text-gray-700 mb-1">End Month</label>
-                        <select id="contextEndMonth" class="w-full p-2 border border-gray-300 rounded-md" required>
+                        <label for="contextEndMonth" class="block text-base font-medium text-gray-700 mb-1">End Month</label> <!-- Increased size -->
+                        <select id="contextEndMonth" class="w-full p-3 text-base border border-gray-300 rounded-md" required> <!-- Increased size -->
                             <!-- Options will be populated by JS -->
                         </select>
                     </div>
                     <div>
-                        <label for="contextEndDay" class="block text-sm font-medium text-gray-700 mb-1">End Day</label>
-                        <select id="contextEndDay" class="w-full p-2 border border-gray-300 rounded-md" required>
+                        <label for="contextEndDay" class="block text-base font-medium text-gray-700 mb-1">End Day</label> <!-- Increased size -->
+                        <select id="contextEndDay" class="w-full p-3 text-base border border-gray-300 rounded-md" required> <!-- Increased size -->
                             <!-- Options will be populated by JS -->
                         </select>
                     </div>
                 </div>
                 <div>
-                    <label for="contextColor" class="block text-sm font-medium text-gray-700 mb-1">Bar Color</label>
-                    <input type="color" id="contextColor" class="w-full h-10 p-1 border border-gray-300 rounded-md" value="#eab308">
+                    <label for="contextColor" class="block text-base font-medium text-gray-700 mb-1">Bar Color</label> <!-- Increased size -->
+                    <input type="color" id="contextColor" class="w-full h-12 p-1 border border-gray-300 rounded-md" value="#eab308"> <!-- Increased size -->
                 </div>
                 <div class="flex items-end">
-                    <button type="submit" class="w-full px-5 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                    <button type="submit" class="w-full px-6 py-3 text-base bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"> <!-- Increased size -->
                         Save Context Era
                     </button>
                 </div>
@@ -568,14 +574,14 @@
 
             <!-- List of existing contexts -->
             <div class="mt-6">
-                <h3 class="text-lg font-medium">Existing Eras</h3>
-                <div id="contextList" class="mt-2 space-y-2 max-h-60 overflow-y-auto p-2 border rounded-md">
-                    <p class="text-gray-500 italic">No context eras added yet.</p>
+                <h3 class="text-xl font-medium">Existing Eras</h3> <!-- Increased size -->
+                <div id="contextList" class="mt-2 space-y-3 max-h-60 overflow-y-auto p-3 border rounded-md"> <!-- Increased padding/spacing -->
+                    <p class="text-gray-500 italic text-base">No context eras added yet.</p> <!-- Increased size -->
                 </div>
             </div>
 
             <div class="mt-6 flex justify-end">
-                <button type="button" id="contextModalClose" class="px-5 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors">
+                <button type="button" id="contextModalClose" class="px-6 py-3 text-base bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"> <!-- Increased size -->
                     Close
                 </button>
             </div>
@@ -583,29 +589,50 @@
     </dialog>
 
     <!-- New Figure Modal Dialog -->
-    <dialog id="figureModal" class="p-0 rounded-lg shadow-xl w-full max-w-md">
-        <form id="figureForm" class="p-6 space-y-4">
-            <h2 class="text-xl font-semibold">Add Key Figure for <span id="figure-modal-year">1947</span></h2>
+    <dialog id="figureModal" class="p-0 rounded-lg shadow-xl w-full max-w-lg"> <!-- Increased size -->
+        <form id="figureForm" class="p-8 space-y-5"> <!-- Increased padding/spacing -->
+            <h2 class="text-2xl font-semibold">Add Key Figure for <span id="figure-modal-year">1947</span></h2> <!-- Increased size -->
             <input type="hidden" id="figure-year-hidden">
             <div>
-                <label for="figureName" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                <input type="text" id="figureName" class="w-full p-2 border border-gray-300 rounded-md" required>
+                <label for="figureName" class="block text-base font-medium text-gray-700 mb-1">Name</label> <!-- Increased size -->
+                <input type="text" id="figureName" class="w-full p-3 text-base border border-gray-300 rounded-md" required> <!-- Increased size -->
             </div>
             <div>
-                <label for="figureImageUrl" class="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
-                <input type="text" id="figureImageUrl" class="w-full p-2 border border-gray-300 rounded-md" placeholder="https://... image link" required>
+                <label for="figureImageUrl" class="block text-base font-medium text-gray-700 mb-1">Image URL</label> <!-- Increased size -->
+                <input type="text" id="figureImageUrl" class="w-full p-3 text-base border border-gray-300 rounded-md" placeholder="https://... image link" required> <!-- Increased size -->
                 <img id="figure-preview" src="https://placehold.co/100x100?text=Preview" alt="preview" class="w-24 h-24 object-cover mt-2 rounded-md border">
             </div>
             <div>
-                <label for="figureDescription" class="block text-sm font-medium text-gray-700 mb-1">Description (for hover)</label>
-                <textarea id="figureDescription" class="w-full p-2 border border-gray-300 rounded-md" rows="3" placeholder="e.g., Role in the Language Movement..." required></textarea>
+                <label for="figureDescription" class="block text-base font-medium text-gray-700 mb-1">Description (for hover)</label> <!-- Increased size -->
+                <textarea id="figureDescription" class="w-full p-3 text-base border border-gray-300 rounded-md" rows="3" placeholder="e.g., Role in the Language Movement..." required></textarea> <!-- Increased size -->
             </div>
             <div class="flex justify-end space-x-3">
-                <button type="button" id="figure-modal-cancel" class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300">Cancel</button>
-                <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700">Save Figure</button>
+                <button type="button" id="figure-modal-cancel" class="px-5 py-3 text-base bg-gray-200 rounded-md hover:bg-gray-300">Cancel</button> <!-- Increased size -->
+                <button type="submit" class="px-5 py-3 text-base bg-emerald-600 text-white rounded-md hover:bg-emerald-700">Save Figure</button> <!-- Increased size -->
             </div>
         </form>
     </dialog>
+    
+    <!-- Year Block (for calculations, outside of visible flow) -->
+    <div id="year-block-template" class="year-block text-center" style="visibility: hidden; position: absolute; z-index: -10;">
+        <span class="relative z-10 inline-block px-8 py-3 bg-emerald-700 text-white font-bold text-3xl rounded-lg shadow-lg">YEAR</span>
+    </div>
+    
+    <!-- Month Item (for calculations, outside of visible flow) -->
+    <div id="month-item-template" class="month-item flex flex-col" style="visibility: hidden; position: absolute; z-index: -10;">
+        <div class="timeline-dot"></div>
+        <div class="month-card z-10 bg-white p-6 rounded-lg shadow-md border border-gray-200">
+            <h3 class="font-bold text-xl text-emerald-600">MONTH</h3>
+            <div class="month-content mt-2">
+                <p class="text-gray-500 italic text-base">No notes added yet.</p>
+            </div>
+            <div class="month-buttons mt-3 flex">
+                <button class="btn-add px-4 py-2 bg-emerald-100 text-emerald-700 text-base font-medium rounded-md hover:bg-emerald-200 transition-colors">
+                    Add Info
+                </button>
+            </div>
+        </div>
+    </div>
 
 
     <!-- Firebase and App Logic -->
@@ -895,15 +922,15 @@
             
             timelineContainer.innerHTML = '<div id="context-bar-container"></div>';
 
+            // Get templates
+            const yearTemplate = document.getElementById('year-block-template').innerHTML;
+            const monthTemplate = document.getElementById('month-item-template').innerHTML;
+
             for (let year = START_YEAR; year <= END_YEAR; year++) {
                 const yearHeader = document.createElement('div');
                 yearHeader.className = 'year-block text-center';
                 yearHeader.dataset.year = year; // <-- Important for IntersectionObserver
-                yearHeader.innerHTML = `
-                    <span class="relative z-10 inline-block px-6 py-2 bg-emerald-700 text-white font-bold text-2xl rounded-lg shadow-lg">
-                        ${year}
-                    </span>
-                `;
+                yearHeader.innerHTML = yearTemplate.replace('YEAR', year);
                 timelineContainer.appendChild(yearHeader);
 
                 MONTHS.forEach(month => {
@@ -913,23 +940,14 @@
                     monthItem.dataset.year = year;
                     monthItem.dataset.month = month;
                     
-                    monthItem.innerHTML = `
-                        <div class="timeline-dot"></div>
-                        <div class="month-card z-10 bg-white p-4 rounded-lg shadow-md border border-gray-200">
-                            <h3 class="font-semibold text-lg text-emerald-600">${month}</h3>
-                            
-                            <div class="month-content mt-2" id="content-${year}-${month}">
-                                <p class="text-gray-500 italic text-sm">No notes added yet.</p>
-                            </div>
-                            
-                            <div class="month-buttons mt-3 flex" id="buttons-${year}-${month}">
-                                <button class="btn-add px-3 py-1 bg-emerald-100 text-emerald-700 text-sm font-medium rounded-md hover:bg-emerald-200 transition-colors"
-                                        data-year="${year}" data-month="${month}">
-                                    Add Info
-                                </button>
-                            </div>
-                        </div>
-                    `;
+                    // Populate template
+                    let monthHtml = monthTemplate.replace('MONTH', month);
+                    monthHtml = monthHtml.replace(/content-template/g, `content-${year}-${month}`);
+                    monthHtml = monthHtml.replace(/buttons-template/g, `buttons-${year}-${month}`);
+                    monthHtml = monthHtml.replace(/data-year-template/g, `data-year="${year}"`);
+                    monthHtml = monthHtml.replace(/data-month-template/g, `data-month="${month}"`);
+                    
+                    monthItem.innerHTML = monthHtml;
                     timelineContainer.appendChild(monthItem);
                 });
             }
@@ -1033,7 +1051,7 @@
                             contentEl.innerHTML = infoContent;
                             monthItemEl.classList.add('has-data'); // Mark as having data
                         } else {
-                            contentEl.innerHTML = `<p class="text-gray-500 italic text-sm">No notes added yet.</p>`;
+                            contentEl.innerHTML = `<p class="text-gray-500 italic text-base">No notes added yet.</p>`;
                             monthItemEl.classList.remove('has-data'); // No notes, so no data
                         }
 
@@ -1048,11 +1066,11 @@
                         }
 
                         buttonsEl.innerHTML = `
-                            <button class="btn-edit px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-md hover:bg-blue-200 transition-colors"
+                            <button class="btn-edit px-4 py-2 bg-blue-100 text-blue-700 text-base font-medium rounded-md hover:bg-blue-200 transition-colors"
                                     data-year="${year}" data-month="${month}" data-id="${id}">
                                 Edit
                             </button>
-                            <button class="btn-delete ml-2 px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-md hover:bg-red-200 transition-colors"
+                            <button class="btn-delete ml-2 px-4 py-2 bg-red-100 text-red-700 text-base font-medium rounded-md hover:bg-red-200 transition-colors"
                                     data-id="${id}">
                                 Delete
                             </button>
@@ -1191,7 +1209,7 @@
                 }
             }
 
-            const barWidthPx = 6;
+            const barWidthPx = 8;
             const barGapPx = 2;
             const initialOffsetFromMainLinePx = 4;
 
@@ -1227,7 +1245,7 @@
                 rolesMap.get(item.role).push(item);
             });
 
-            const laneWidth = 10;
+            const laneWidth = 12;
             const laneGap = 16;
             let laneIndex = 0;
 
@@ -1280,20 +1298,20 @@
          */
         function renderContextListInModal() {
             if (allContextData.length === 0) {
-                contextList.innerHTML = `<p class="text-gray-500 italic">No context eras added yet.</p>`;
+                contextList.innerHTML = `<p class="text-gray-500 italic text-base">No context eras added yet.</p>`;
                 return;
             }
 
             contextList.innerHTML = allContextData.map(item => `
-                <div class="flex items-center justify-between p-2 bg-white border rounded-md">
+                <div class="flex items-center justify-between p-3 bg-white border rounded-md">
                     <div class="flex-1">
-                        <span class="font-medium" style="color: ${item.color};">■ ${escapeHTML(item.role)}:</span>
-                        <span class="text-gray-700">${escapeHTML(item.name)}</span>
-                        <span class="text-xs text-gray-500 block">
+                        <span class="font-medium text-base" style="color: ${item.color};">■ ${escapeHTML(item.role)}:</span>
+                        <span class="text-gray-700 text-base">${escapeHTML(item.name)}</span>
+                        <span class="text-sm text-gray-500 block">
                             (${item.startDay || ''} ${item.startMonth} ${item.startYear} - ${item.endDay || ''} ${item.endMonth} ${item.endYear})
                         </span>
                     </div>
-                    <button class="btn-delete-context ml-4 px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-md hover:bg-red-200 transition-colors"
+                    <button class="btn-delete-context ml-4 px-4 py-2 bg-red-100 text-red-700 text-base font-medium rounded-md hover:bg-red-200 transition-colors"
                             data-id="${item.id}">
                         Delete
                     </button>
@@ -1313,11 +1331,11 @@
                 const buttonsEl = document.getElementById(`buttons-${year}-${month}`);
                 
                 if (contentEl) {
-                    contentEl.innerHTML = `<p class="text-gray-500 italic text-sm">No notes added yet.</p>`;
+                    contentEl.innerHTML = `<p class="text-gray-500 italic text-base">No notes added yet.</p>`;
                 }
                 if (buttonsEl) {
                     buttonsEl.innerHTML = `
-                        <button class="btn-add px-3 py-1 bg-emerald-100 text-emerald-700 text-sm font-medium rounded-md hover:bg-emerald-200 transition-colors"
+                        <button class="btn-add px-4 py-2 bg-emerald-100 text-emerald-700 text-base font-medium rounded-md hover:bg-emerald-200 transition-colors"
                                 data-year="${year}" data-month="${month}">
                             Add Info
                         </button>
@@ -1362,7 +1380,7 @@
                     
                     figEl.innerHTML = `
                         <img src="${escapeHTML(fig.imageUrl)}" alt="${escapeHTML(fig.name)}" class="w-full h-24 object-cover rounded-md border" onerror="this.src='https://placehold.co/100x100?text=Image'">
-                        <p class="text-xs text-center font-medium truncate mt-1">${escapeHTML(fig.name)}</p>
+                        <p class="text-sm text-center font-medium truncate mt-1">${escapeHTML(fig.name)}</p>
                         <button class="btn-delete-figure bg-red-600 text-white" data-id="${fig.id}">
                             &times;
                         </button>
@@ -1505,15 +1523,15 @@
          */
         function createNoteEntry(note = { note: '', day: '', tag: '' }) {
             const entryDiv = document.createElement('div');
-            entryDiv.className = 'note-entry-group p-3 border rounded-md bg-white shadow-sm';
+            entryDiv.className = 'note-entry-group p-4 border rounded-md bg-white shadow-sm';
             entryDiv.innerHTML = `
-                <textarea class="note-text-input w-full p-2 border border-gray-300 rounded-md" rows="2" placeholder="Enter note...">${escapeHTML(note.note)}</textarea>
+                <textarea class="note-text-input w-full p-3 text-base border border-gray-300 rounded-md" rows="2" placeholder="Enter note...">${escapeHTML(note.note)}</textarea>
                 <div class="flex items-center space-x-2 mt-2">
-                    <select class="note-day-input p-2 border border-gray-300 rounded-md text-sm">
+                    <select class="note-day-input p-3 text-base border border-gray-300 rounded-md">
                         ${DAY_OPTIONS_HTML}
                     </select>
-                    <input type="text" class="note-tag-input w-full p-2 border border-gray-300 rounded-md text-sm" placeholder="Tag (optional)" value="${escapeHTML(note.tag)}">
-                    <button type="button" class="btn-remove-note px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-md hover:bg-red-200">
+                    <input type="text" class="note-tag-input w-full p-3 text-base border border-gray-300 rounded-md" placeholder="Tag (optional)" value="${escapeHTML(note.tag)}">
+                    <button type="button" class="btn-remove-note px-3 py-2 bg-red-100 text-red-700 text-sm font-medium rounded-md hover:bg-red-200">
                         Remove
                     </button>
                 </div>
