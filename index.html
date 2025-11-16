@@ -430,6 +430,21 @@
             max-height: 300px;
             overflow-y: auto;
         }
+        
+        /* NEW: Debug Borders */
+        .main-app-content, .main-app-content header, .main-app-content main,
+        #timeline-container, .month-item, .month-card,
+        #context-bar-container, .context-bar-lane {
+            border: 1px dashed red;
+        }
+        
+        #sidebar {
+            border: 2px solid blue;
+        }
+        
+        #sidebar-content {
+            border: 2px solid green;
+        }
     </style>
 </head>
 <body class="antialiased text-gray-800">
@@ -514,7 +529,7 @@
 
             <!-- Column 2: New Sidebar -->
             <aside id="sidebar" class="lg:col-span-1 relative">
-                <div id="sidebar-content" class="sticky top-[180px] p-6 bg-white shadow-lg rounded-lg border border-gray-200"> <!-- Increased padding -->
+                <div id="sidebar-content" class="sticky top-[180px] bg-white shadow-lg rounded-lg border border-gray-200"> <!-- Increased padding -->
                     <h2 class="text-3xl font-bold mb-4">Analysis for <span id="sidebar-year">1947</span></h2> <!-- Increased size -->
             
                     <!-- Summary Box - MODIFIED for display only -->
@@ -548,7 +563,7 @@
 
     <!-- Info Modal Dialog -->
     <dialog id="infoModal" class="p-0 rounded-lg shadow-xl w-full max-w-xl"> <!-- Increased size -->
-        <form id="infoForm" class="p-8 space-y-6"> <!-- Increased padding/spacing -->
+        <form id="infoForm" class="space-y-6"> <!-- Increased padding/spacing -->
             <div>
                 <h2 class="text-3xl font-semibold" id="modalTitle">Add Information</h2> <!-- Increased size -->
                 <p class="text-lg text-gray-600" id="modalSubTitle">Year 1947, January</p> <!-- Increased size -->
