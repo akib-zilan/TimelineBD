@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,6 +40,10 @@ font-size: var(--global-scale, 100%); /* Controlled by JS */
 --modal-body-fs: var(--pop-body-fs, 1rem); /* Controlled by JS */
 --modal-padding-y: var(--pop-pady, 2rem); /* NEW */
 --modal-padding-x: var(--pop-padx, 2rem); /* NEW */
+}
+
+html {
+  scroll-behavior: smooth; /* Enables smooth scrolling for the whole page */
 }
 
 body {
@@ -2876,7 +2881,7 @@ return {
     </div>
 
     <button id="scroll-to-bottom-btn" class="w-14 h-14 bg-gray-700 text-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-800 transition-colors" style="display: none;" title="Go to Bottom">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <svg xmlns="http://www.w.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
         </svg>
     </button>
@@ -2934,12 +2939,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (yearElement) {
             const headerHeight = headerElement ? headerElement.offsetHeight : 0;
-            // Get the element's position relative to the viewport, then add current scroll position
-            const elementTop = yearElement.getBoundingClientRect().top + window.scrollY;
-
-            window.scrollTo({
-                top: elementTop - headerHeight - 20, // 20px padding below header
-                behavior: 'smooth'
+            
+            // Set scroll-padding-top on the root element to offset for the sticky header
+            document.documentElement.style.scrollPaddingTop = `${headerHeight + 20}px`; // 20px padding
+            
+            // Use scrollIntoView which respects scroll-padding-top
+            yearElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
             });
         }
     });
