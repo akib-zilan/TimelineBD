@@ -85,16 +85,16 @@
 
         /* Styling for each year block */
         .year-block {
-            position: relative;
+            /* NEW: Sticky Year Header */
+            position: sticky;
+            top: 180px; /* Default, will be overridden by JS */
+            z-index: 45; /* Below header (50) but above sidebar (40) */
             padding: 2.5rem 0; 
-            /* This div is a positioning anchor, the span inside is sticky */
+            /* This div is now sticky */
         }
         .year-block span {
              font-size: var(--timeline-year-fs);
-             /* NEW: Sticky Year Header */
-             position: sticky;
-             top: 180px; /* Default, will be overridden by JS */
-             z-index: 45; /* Below header (50) but above sidebar (40) */
+             /* REMOVED sticky from here */
         }
 
         /* Styling for each month's "dot" on the timeline */
@@ -370,9 +370,9 @@
             /* top: 180px; */ /* REMOVED: Set by JS */
             padding: var(--sidebar-padding-y) var(--sidebar-padding-x); /* NEW: Controlled by JS */
             
-            /* NEW: 200% Width + 50% Overlap */
+            /* NEW: 200% Width + 40% Overlap */
             width: 200%;
-            transform: translateX(-50%);
+            transform: translateX(-40%);
             z-index: 40;
         }
         
@@ -417,7 +417,7 @@
             opacity: 0;
             visibility: hidden;
             transition: all 0.2s ease-in-out;
-            z-index: 50;
+            z-index: 60; /* NEW: Highest z-index */
             pointer-events: none; /* Allow hover on image */
         }
         
@@ -1211,7 +1211,7 @@
                 }
                 analysisYearSelect.innerHTML = yearOptions;
 
-                // Render the static HTML structure
+                // Render the static timeline structure
                 renderTimelineStructure();
 
                 // Set up authentication
@@ -1238,8 +1238,8 @@
                 }
                 
                 // 2. NEW: Update all Year Headers
-                document.querySelectorAll('.year-block span').forEach(span => {
-                    span.style.top = stickyTopValue;
+                document.querySelectorAll('.year-block').forEach(block => { // Target the block
+                    block.style.top = stickyTopValue; // Set top on the block
                 });
             }
         }
@@ -1841,7 +1841,6 @@
                         <!-- NEW: Custom Hover Tooltip -->
                         <div class="figure-description-tooltip">
                             ${escapeHTML(fig.description)}
-                            <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-gray-900"></div>
                         </div>
                     `;
                     keyFiguresContainer.appendChild(figEl);
