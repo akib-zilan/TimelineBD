@@ -502,7 +502,7 @@
         <main class="container mx-auto max-w-screen-2xl py-16 px-6 grid grid-cols-1 lg:grid-cols-3" style="gap: var(--main-gap);"> <!-- Increased max-width and gap -->
             
             <!-- Column 1: Timeline -->
-            <div class="lg:col-span-2">
+            <div class="lg-col-span-2">
                 <div id="timeline-container" class="relative timeline-container">
                     <!-- New container for political context bars -->
                     <div id="context-bar-container">
@@ -2162,47 +2162,70 @@
         function observeYearHeaders(stickyTopPx = 180) { // NEW: Accepts dynamic top value
             if (yearObserver) yearObserver.disconnect(); // Disconnect old observer
             
-            // NEW: Observe the year-block itself, not an anchor
-            // Trigger when the top of the block hits the sticky line
+            // This defines the "active" area of the screen. It starts `stickyTopPx` from the top
+            // and ends 100px from the bottom (an arbitrary buffer).
             const observerOptions = {
                 root: null, // viewport
-                rootMargin: `-${stickyTopPx}px 0px -${window.innerHeight - stickyTopPx - 1}px 0px`,
-                threshold: 0
+                rootMargin: `-${stickyTopPx}px 0px -100px 0px`,
+                threshold: 0 // Fire as soon as any part of the element enters this region
             };
             
-            // UPDATED: Robust observer logic for scrolling up and down
+            // This map will hold the elements currently in the "active" zone
+            const intersectingElements = new Map();
+
             yearObserver = new IntersectionObserver((entries) => {
                 
-                // The `entries` array is chronological. We only care about the most recent change.
-                const latestEntry = entries[entries.length - 1];
-                if (!latestEntry) return;
+                // Update our map of intersecting elements
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        intersectingElements.set(entry.target, entry);
+                    } else {
+                        intersectingElements.delete(entry.target);
+                    }
+                });
 
-                if (latestEntry.isIntersecting) {
-                    // This entry just *entered* the 1px line. This is our new active year.
-                    // This happens when scrolling DOWN (e.g., 1948 enters)
-                    // OR when scrolling UP (e.g., 1947 enters)
-                    const year = latestEntry.target.dataset.year;
+                // Find the element that is "most active"
+                // This means it's in the map and is the one closest to the top (smallest boundingClientRect.top)
+                let mostActiveElement = null;
+                let smallestTopValue = Infinity;
+
+                intersectingElements.forEach((entry, element) => {
+                    // Re-check bounding rect in case it's changed since observer fired
+                    const top = element.getBoundingClientRect().top; 
+                    if (top < smallestTopValue) {
+                        smallestTopValue = top;
+                        mostActiveElement = element;
+                    }
+                });
+
+                if (mostActiveElement) {
+                    const year = mostActiveElement.dataset.year;
                     if (year && year !== currentActiveYear) {
                         currentActiveYear = year;
                         updateSidebarContent(year);
                     }
-                } else if (!latestEntry.isIntersecting && latestEntry.boundingClientRect.top < stickyTopPx) {
-                    // This entry just *left* the 1px line, moving *upwards*.
-                    // This means we are scrolling UP. The active year should be the one *before* this.
-                    const yearThatLeft = parseInt(latestEntry.target.dataset.year);
-                    if (yearThatLeft > START_YEAR) {
-                        const yearToActivate = (yearThatLeft - 1).toString();
-                        if (yearToActivate !== currentActiveYear) {
-                            currentActiveYear = yearToActivate;
+                } else if (intersectingElements.size === 0) {
+                    // This can happen if scrolling up *very* fast past the START_YEAR
+                    // or scrolling down past the END_YEAR.
+                    // We need to check our position relative to the first/last elements.
+                    
+                    const firstYearBlock = document.querySelector('.year-block[data-year="' + START_YEAR + '"]');
+                    if (!firstYearBlock) return;
+
+                    const firstBlockTop = firstYearBlock.getBoundingClientRect().top;
+                    
+                    if (firstBlockTop > stickyTopPx) {
+                        // We are scrolled all the way to the top, above the first block
+                        if (currentActiveYear !== START_YEAR.toString()) {
+                            currentActiveYear = START_YEAR.toString();
                             updateSidebarContent(currentActiveYear);
                         }
                     }
+                    // If we scroll past the end, the last active year will just remain active.
                 }
-                // We don't need an `else` for `isIntersecting: false` and `boundingClientRect.top > stickyTopPx`
-                // because that's "scrolling down", and the *next* block's `isIntersecting: true`
-                // event will handle the update.
 
             }, observerOptions);
+
 
             // NEW: Observe the .year-block elements
             document.querySelectorAll('.year-block').forEach(block => {
