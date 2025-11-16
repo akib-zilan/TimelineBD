@@ -362,9 +362,11 @@
         
         #sidebar-content {
             position: sticky;
-            top: 180px; 
+            /* top: 180px; */ /* REMOVED: Set by JS */
             padding: var(--sidebar-padding-y) var(--sidebar-padding-x); /* NEW: Controlled by JS */
-            /* NEW: 50% Overlap */
+            
+            /* NEW: 200% Width + 50% Overlap */
+            width: 200%;
             transform: translateX(-50%);
             z-index: 40;
         }
@@ -513,7 +515,7 @@
 
             <!-- Column 2: New Sidebar -->
             <aside id="sidebar" class="lg:col-span-1 relative">
-                <div id="sidebar-content" class="sticky top-[180px] bg-white shadow-lg rounded-lg border border-gray-200"> <!-- Increased padding -->
+                <div id="sidebar-content" class="sticky bg-white shadow-lg rounded-lg border border-gray-200"> <!-- Increased padding -->
                     <h2 class="text-3xl font-bold mb-4">Analysis for <span id="sidebar-year">1947</span></h2> <!-- Increased size -->
             
                     <!-- Summary Box - MODIFIED for display only -->
@@ -1037,6 +1039,7 @@
         let DAY_OPTIONS_HTML = ''; // Will be populated once
 
         // DOM Elements
+        const header = document.querySelector('header'); // NEW
         const timelineContainer = document.getElementById('timeline-container');
         const userInfo = document.getElementById('userInfo');
         const modal = document.getElementById('infoModal');
@@ -1078,6 +1081,7 @@
         
         // --- New Sidebar DOM Elements ---
         const sidebar = document.getElementById('sidebar'); // NEW
+        const sidebarContent = document.getElementById('sidebar-content'); // NEW
         const sidebarYear = document.getElementById('sidebar-year');
         const summaryDisplay = document.getElementById('summary-display'); // MODIFIED
         const keyFiguresContainer = document.getElementById('key-figures-container');
@@ -1193,6 +1197,14 @@
                 userInfo.textContent = "Error: Could not connect to services.";
             }
         });
+        
+        // NEW: Function to set sticky top
+        function updateStickyTop() {
+            if (header && sidebarContent) {
+                const headerHeight = header.offsetHeight;
+                sidebarContent.style.top = `${headerHeight + 20}px`;
+            }
+        }
 
         /**
          * Sets up Firebase authentication and listens for state changes.
@@ -1224,6 +1236,9 @@
                     // Show the app, hide the login
                     mainAppContent.style.display = 'block';
                     loginOverlay.style.display = 'none';
+                    
+                    // NEW: Set sticky top position
+                    updateStickyTop();
                     
                     // NEW: Update analysis modal for the default selected year
                     updateAnalysisModal(analysisYearSelect.value);
@@ -1868,6 +1883,9 @@
             });
             
             tagFilterInput.addEventListener('input', applyTagFilter);
+            
+            // NEW: Listen for window resize to update sticky top
+            window.addEventListener('resize', updateStickyTop);
 
             // --- Notes Modal Listeners ---
             modalForm.addEventListener('submit', (e) => {
