@@ -43,6 +43,7 @@ font-size: var(--global-scale, 100%); /* Controlled by JS */
 
 html {
   scroll-behavior: smooth; /* Enables smooth scrolling for the whole page */
+  /* scroll-padding-top will be set by JavaScript */
 }
 
 body {
@@ -1138,9 +1139,12 @@ userInfo.textContent = "Error: Could not connect to services.";
 
 // NEW: Function to set sticky top
 function updateStickyTop() {
-if (header) { // sidebarContent is already checked
+if (header) { 
 const headerHeight = header.offsetHeight;
 const stickyTopValue = `${headerHeight + 20}px`;
+
+// NEW: Set the scroll padding on the root element for correct anchor scrolling
+document.documentElement.style.scrollPaddingTop = stickyTopValue;
 
 // 1. Update Sidebar
 if (sidebarContent) {
@@ -1148,8 +1152,8 @@ sidebarContent.style.top = stickyTopValue;
 }
 
 // 2. NEW: Update all Year Headers
-document.querySelectorAll('.year-block').forEach(block => { // Target the block
-block.style.top = stickyTopValue; // Set top on the block
+document.querySelectorAll('.year-block').forEach(block => {
+block.style.top = stickyTopValue;
 });
 
 // 3. NEW: Re-initialize the observer with the new stickyTopValue
@@ -1179,10 +1183,6 @@ listenForTimelinesList();
 // Show the app, hide the login
 mainAppContent.style.display = 'block';
 loginOverlay.style.display = 'none';
-
-// NEW: Set sticky top position
-// MODIFIED: This is now called *after* a timeline is activated
-// updateStickyTop();
 
 } else {
 // --- User is SIGNED OUT ---
@@ -1273,10 +1273,14 @@ return;
 
 // MODIFIED: Uses global START_YEAR and END_YEAR
 for (let year = START_YEAR; year <= END_YEAR; year++) {
+// NEW: Add an invisible anchor div before the year block for reliable navigation
+const anchor = document.createElement('div');
+anchor.id = `year-anchor-${year}`;
+timelineContainer.appendChild(anchor);
+
 const yearHeader = document.createElement('div');
 yearHeader.className = 'year-block text-center';
 yearHeader.dataset.year = year; // <-- Important for IntersectionObserver
-// RESTORED old logic with new, larger classes
 yearHeader.innerHTML = ` 
                <span class="relative z-10 inline-block px-8 py-3 bg-emerald-700 text-white font-bold rounded-lg shadow-lg">
                    ${year}
@@ -1291,7 +1295,6 @@ monthItem.id = `month-item-${year}-${month}`;
 monthItem.dataset.year = year;
 monthItem.dataset.month = month;
 
-// RESTORED old logic with new, larger classes
 monthItem.innerHTML = `
                            <div class="timeline-dot"></div>
                            <div class="month-card z-10 bg-white p-6 rounded-lg shadow-md border border-gray-200">
@@ -1316,9 +1319,6 @@ timelineContainer.appendChild(monthItem);
 // MODIFIED: This function must be called to repopulate dropdowns
 // with the new year range.
 populateContextDateDropdowns();
-
-// After rendering, set up the observer
-// observeYearHeaders(); // REMOVED: Called by updateStickyTop now
 }
 
 /**
@@ -2933,25 +2933,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedYear = yearJumpSelect.value;
         if (!selectedYear) return;
 
-        // Target the non-sticky span inside the block for a more stable position reading
-        const yearElement = document.querySelector(`.year-block[data-year="${selectedYear}"] span`);
-        const headerElement = document.querySelector('header');
+        // Target the invisible anchor element
+        const anchorElement = document.getElementById(`year-anchor-${selectedYear}`);
 
-        if (yearElement && headerElement) {
-            const headerHeight = headerElement.offsetHeight;
-            
-            // Calculate the absolute top position of the target year element
-            const elementTop = yearElement.getBoundingClientRect().top + window.scrollY;
-            
-            // Calculate the final scroll position.
-            // We subtract the header's height and an additional 20px for padding.
-            // We also subtract half the element's height to center it a bit more nicely.
-            const targetScrollPosition = elementTop - headerHeight - 20 - (yearElement.offsetHeight / 2);
-
-            window.scrollTo({
-                top: targetScrollPosition,
-                behavior: 'smooth'
-            });
+        if (anchorElement) {
+            // Use the browser's built-in scroll behavior.
+            // It will automatically respect the 'scroll-padding-top' set in the main script.
+            anchorElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     });
 
@@ -3036,4 +3024,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
---- START OF FILE App.tsx ------ END OF FILE ---
