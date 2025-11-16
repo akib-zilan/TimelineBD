@@ -1046,6 +1046,31 @@
     <div id="global-tooltip" class="fixed p-3 text-sm text-white bg-gray-900 rounded-lg shadow-lg z-[9999] opacity-0 transition-opacity duration-200 pointer-events-none" style="max-width: 300px; transform: translate(-50%, 10px); visibility: hidden;"></div>
 
 
+    <!-- NEW: Floating Navigation Buttons -->
+    <div id="navigation-fab" class="fixed bottom-8 right-8 z-50 flex flex-col space-y-3">
+        <!-- Go to Top -->
+        <button id="goToTopBtn" title="Go to Top" class="px-3 py-2 bg-white text-emerald-700 rounded-full shadow-lg hover:bg-emerald-100 transition-colors border border-gray-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+            </svg>
+        </button>
+        <!-- Previous Year -->
+        <button id="goToPrevYearBtn" title="Previous Year" class="px-4 py-2 bg-white text-emerald-700 rounded-full shadow-lg hover:bg-emerald-100 transition-colors border border-gray-200 text-sm font-medium">
+            Prev Year
+        </button>
+        <!-- Next Year -->
+        <button id="goToNextYearBtn" title="Next Year" class="px-4 py-2 bg-white text-emerald-700 rounded-full shadow-lg hover:bg-emerald-100 transition-colors border border-gray-200 text-sm font-medium">
+            Next Year
+        </button>
+        <!-- Go to Bottom -->
+        <button id="goToBottomBtn" title="Go to Bottom" class="px-3 py-2 bg-white text-emerald-700 rounded-full shadow-lg hover:bg-emerald-100 transition-colors border border-gray-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+        </button>
+    </div>
+
+
     <!-- Firebase and App Logic -->
     <script type="module">
         // Import Firebase modules
@@ -1274,6 +1299,12 @@
         const manageTimelinesModal = document.getElementById('manageTimelinesModal');
         const manageTimelinesList = document.getElementById('manageTimelinesList');
         const manageTimelinesClose = document.getElementById('manageTimelinesClose');
+
+        // --- NEW: Floating Navigation Buttons ---
+        const goToTopBtn = document.getElementById('goToTopBtn');
+        const goToPrevYearBtn = document.getElementById('goToPrevYearBtn');
+        const goToNextYearBtn = document.getElementById('goToNextYearBtn');
+        const goToBottomBtn = document.getElementById('goToBottomBtn');
 
 
         // --- INITIALIZATION ---
@@ -1894,600 +1925,52 @@
                 }
             });
 
-            const allSpans = Array.from(spansMap.values())
-                .filter(s => s.startTop !== undefined && s.endTop !== undefined && s.endTop > s.startTop)
-                .sort((a, b) => a.startTop - b.startTop);
-
-            const activeLanes = []; 
-            for (const span of allSpans) {
-                let foundLane = false;
-                for (let i = 0; i < activeLanes.length; i++) {
-                    if (span.startTop >= activeLanes[i]) {
-                        activeLanes[i] = span.endTop;
-                        span.lane = i;
-                        foundLane = true;
-                        break;
-                    }
-                }
-                if (!foundLane) {
-                    span.lane = activeLanes.length;
-                    activeLanes.push(span.endTop);
-                }
-            }
-
-            const barWidthPx = 8;
-            const barGapPx = 2;
-            const initialOffsetFromMainLinePx = 4;
-
-            for (const span of allSpans) {
-                const totalOffsetForThisLane = initialOffsetFromMainLinePx + (span.lane * (barWidthPx + barGapPx));
-                const height = span.endTop - span.startTop;
-
-                const spanBar = document.createElement('div');
-                spanBar.className = 'duration-span';
-                spanBar.style.backgroundColor = span.color;
-                spanBar.style.top = `${span.startTop}px`;
-                spanBar.style.height = `${height}px`;
-                spanBar.style.width = `${barWidthPx}px`;
-                spanBar.style.transform = `translateX(calc(-100% - ${totalOffsetForThisLane}px))`;
-                spanBar.title = span.title; // Show title on hover
-                timelineContainer.appendChild(spanBar);
-            }
-        }
-
-        /**
-         * Renders the vertical context bars on the timeline.
-         */
-        function renderContextBars() {
-            const contextBarContainer = document.getElementById('context-bar-container');
-            if (!contextBarContainer) return;
-            contextBarContainer.innerHTML = '';
-            
-            const rolesMap = new Map();
-            allContextData.forEach(item => {
-                // NEW: Filter out data not in the current year range
-                if (item.startYear > END_YEAR || item.endYear < START_YEAR) {
-                    return;
-                }
-                if (!rolesMap.has(item.role)) {
-                    rolesMap.set(item.role, []);
-                }
-                rolesMap.get(item.role).push(item);
+            // --- NEW: Floating Navigation Listeners ---
+            goToTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             });
 
-            const laneWidth = 12;
-            const laneGap = 16;
-            let laneIndex = 0;
+            goToBottomBtn.addEventListener('click', () => {
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            });
 
-            rolesMap.forEach((segments, role) => {
-                const laneOffset = laneIndex * (laneWidth + laneGap);
-                
-                const laneEl = document.createElement('div');
-                laneEl.className = 'context-bar-lane';
-                laneEl.style.left = `${laneOffset}px`;
-                
-                const legendEl = document.createElement('div');
-                legendEl.className = 'context-bar-legend';
-                legendEl.textContent = role;
-                laneEl.appendChild(legendEl);
+            goToPrevYearBtn.addEventListener('click', () => {
+                if (!activeTimelineId) return;
+                try {
+                    let current = parseInt(currentActiveYear);
+                    if (current <= START_YEAR) return; // Already at start
 
-                segments.forEach(segment => {
-                    // NEW: Clamp start and end dates to the timeline range
-                    let segmentStartYear = segment.startYear;
-                    let segmentStartMonth = segment.startMonth;
-                    let segmentEndYear = segment.endYear;
-                    let segmentEndMonth = segment.endMonth;
-
-                    if (segmentStartYear < START_YEAR) {
-                        segmentStartYear = START_YEAR;
-                        segmentStartMonth = MONTHS[0];
-                    }
-                    if (segmentEndYear > END_YEAR) {
-                        segmentEndYear = END_YEAR;
-                        segmentEndMonth = MONTHS[11];
-                    }
-
-                    const startEl = document.getElementById(`month-item-${segmentStartYear}-${segmentStartMonth}`);
-                    const endEl = document.getElementById(`month-item-${segmentEndYear}-${segmentEndMonth}`);
+                    let prevYear = current - 1;
+                    const prevYearEl = document.querySelector(`.year-block[data-year="${prevYear}"]`);
                     
-                    if (!startEl || !endEl) return;
-
-                    const startDot = startEl.querySelector('.timeline-dot');
-                    const endDot = endEl.querySelector('.timeline-dot');
-                    
-                    if (!startDot || !endDot) return;
-
-                    const startTop = startEl.offsetTop + startDot.offsetTop;
-                    const endTop = endEl.offsetTop + endDot.offsetTop;
-                    const height = endTop - startTop;
-
-                    if (height < 0) return;
-
-                    const segmentEl = document.createElement('div');
-                    segmentEl.className = 'context-bar-segment';
-                    segmentEl.style.backgroundColor = segment.color;
-                    segmentEl.style.top = `${startTop}px`;
-                    segmentEl.style.height = `${height}px`;
-                    segmentEl.title = `${role}: ${segment.name}\n(${segment.startDay || ''} ${segment.startMonth} ${segment.startYear} - ${segment.endDay || ''} ${segment.endMonth} ${segment.endYear})`;
-                    
-                    laneEl.appendChild(segmentEl);
-                });
-                
-                contextBarContainer.appendChild(laneEl);
-                laneIndex++;
-            });
-        }
-
-        /**
-         * Renders the list of context items in the management modal.
-         */
-        function renderContextListInModal() {
-            if (allContextData.length === 0) {
-                contextList.innerHTML = `<p class="text-gray-500 italic text-base">No context eras added yet.</p>`;
-                return;
-            }
-
-            contextList.innerHTML = allContextData.map(item => `
-                <div class="flex items-center justify-between p-3 bg-white border rounded-md">
-                    <div class="flex-1">
-                        <span class="font-medium text-base" style="color: ${item.color};">■ ${escapeHTML(item.role)}:</span>
-                        <span class="text-gray-700 text-base">${escapeHTML(item.name)}</span>
-                        <span class="text-sm text-gray-500 block">
-                            (${item.startDay || ''} ${item.startMonth} ${item.startYear} - ${item.endDay || ''} ${item.endMonth} ${item.endYear})
-                        </span>
-                    </div>
-                    <button class="btn-delete-context ml-4 px-4 py-2 bg-red-100 text-red-700 text-base font-medium rounded-md hover:bg-red-200 transition-colors"
-                            data-id="${item.id}">
-                        Delete
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        /**
-         * NEW: Renders the list of timelines in the management modal.
-         */
-        function renderTimelinesListInModal() {
-            if (allTimelines.length === 0) {
-                manageTimelinesList.innerHTML = `<p class="text-gray-500 italic text-base">No timelines created yet.</p>`;
-                return;
-            }
-
-            manageTimelinesList.innerHTML = allTimelines.map(timeline => {
-                const isActive = timeline.id === activeTimelineId;
-                return `
-                <div class="flex items-center justify-between p-3 ${isActive ? 'bg-green-50 border-green-300' : 'bg-white border'} rounded-md">
-                    <div class="flex-1">
-                        <span class="font-medium text-base">${escapeHTML(timeline.name)}</span>
-                        <span class="text-sm text-gray-500 block">
-                            (${timeline.startYear} - ${timeline.endYear})
-                            ${isActive ? '<span class="ml-2 font-bold text-green-700">(Active)</span>' : ''}
-                        </span>
-                    </div>
-                    <div class="flex space-x-2">
-                        <button class="btn-activate-timeline px-4 py-2 bg-green-100 text-green-700 text-base font-medium rounded-md hover:bg-green-200 transition-colors"
-                                data-id="${timeline.id}" ${isActive ? 'disabled' : ''}>
-                            ${isActive ? 'Active' : 'Activate'}
-                        </button>
-                        <button class="btn-delete-timeline ml-2 px-4 py-2 bg-red-100 text-red-700 text-base font-medium rounded-md hover:bg-red-200 transition-colors"
-                                data-id="${timeline.id}">
-                            Delete
-                        </button>
-                    </div>
-                </div>
-            `}).join('');
-        }
-        
-        /**
-         * Resets all month items to their default "empty" state.
-         */
-        function resetAllMonthItems() {
-            document.querySelectorAll('.month-item').forEach(item => {
-                const { year, month } = item.dataset;
-                if (!year || !month) return;
-                
-                const contentEl = document.getElementById(`content-${year}-${month}`);
-                const buttonsEl = document.getElementById(`buttons-${year}-${month}`);
-                
-                if (contentEl) {
-                    contentEl.innerHTML = `<p class="text-gray-500 italic text-base">No notes added yet.</p>`;
-                }
-                if (buttonsEl) {
-                    buttonsEl.innerHTML = `
-                        <button class="btn-add px-4 py-2 bg-emerald-100 text-emerald-700 text-base font-medium rounded-md hover:bg-emerald-200 transition-colors"
-                                data-year="${year}" data-month="${month}">
-                            Add Info
-                        </button>
-                    `;
-                }
-                delete item.dataset.id;
-                item.classList.remove('has-data');
-                item.classList.remove('filtered-out'); // Reset filter
-            });
-            // Reset all note items
-            document.querySelectorAll('.month-note-item').forEach(note => {
-                note.classList.remove('filtered-out');
-            });
-        }
-        
-        /**
-         * Updates the content of the sticky sidebar based on the active year.
-         */
-        function updateSidebarContent(year) {
-            // NEW: Ensure the year is within the current range.
-            // If the user shrinks the range, the old `currentActiveYear` might be invalid.
-            // Default to the new START_YEAR if it's out of bounds.
-            if (year < START_YEAR || year > END_YEAR) {
-                year = START_YEAR.toString();
-                currentActiveYear = year;
-            }
-            
-            if (!year || !activeTimelineId) {
-                // NEW: Handle no active timeline
-                sidebarYear.textContent = "----";
-                summaryDisplay.innerHTML = `<p class="text-gray-500 italic text-base">No timeline active.</p>`;
-                keyFiguresContainer.innerHTML = '';
-                keyFiguresContainer.appendChild(keyFiguresPlaceholder);
-                keyFiguresPlaceholder.style.display = 'block';
-                return;
-            };
-            
-            // 1. Update Title
-            sidebarYear.textContent = year;
-            
-            // 2. Update Summary Textarea
-            const summary = allSummaries.get(year) || '';
-            summaryDisplay.textContent = summary; // MODIFIED: Set textContent on the div
-            if (!summary) {
-                summaryDisplay.innerHTML = `<p class="text-gray-500 italic text-base">No summary added for this year.</p>`;
-            }
-            
-            // 3. Update Key Figures
-            keyFiguresContainer.innerHTML = ''; // Clear existing
-            const figuresForYear = allKeyFigures.filter(fig => fig.year == year);
-            
-            if (figuresForYear.length === 0) {
-                keyFiguresContainer.appendChild(keyFiguresPlaceholder);
-                keyFiguresPlaceholder.style.display = 'block';
-            } else {
-                keyFiguresPlaceholder.style.display = 'none';
-                figuresForYear.forEach(fig => {
-                    const figEl = document.createElement('div');
-                    figEl.className = 'figure-item relative';
-                    figEl.dataset.description = escapeHTML(fig.description); // NEW: Add data attribute
-                    
-                    figEl.innerHTML = `
-                        <img src="${escapeHTML(fig.imageUrl)}" alt="${escapeHTML(fig.name)}" class="w-full h-24 object-cover rounded-md border" onerror="this.src='https://placehold.co/100x100?text=Image'">
-                        <p class="text-sm text-center font-medium truncate mt-1">${escapeHTML(fig.name)}</p>
-                        <!-- DELETED: Inline tooltip div -->
-                    `;
-                    keyFiguresContainer.appendChild(figEl);
-                });
-            }
-        }
-        
-        /**
-         * NEW: Updates the content of the Analysis Modal based on the selected year.
-         */
-        function updateAnalysisModal(year) {
-            if (!year || !activeTimelineId) {
-                analysisSummaryTextarea.value = "";
-                analysisSummaryTextarea.disabled = true;
-                analysisFigureForm.reset();
-                analysisFigureForm.disabled = true;
-                analysisFiguresList.innerHTML = `<p class="text-gray-500 italic text-base">No timeline active.</p>`;
-                return;
-            };
-
-            analysisSummaryTextarea.disabled = false;
-            analysisFigureForm.disabled = false;
-            
-            // 1. Update Summary Textarea
-            const summary = allSummaries.get(year) || '';
-            analysisSummaryTextarea.value = summary;
-            
-            // 2. Update Key Figures List
-            analysisFiguresList.innerHTML = ''; // Clear existing
-            const figuresForYear = allKeyFigures.filter(fig => fig.year == year);
-            
-            if (figuresForYear.length === 0) {
-                analysisFiguresList.innerHTML = `<p class="text-gray-500 italic text-base">No figures added for this year.</p>`;
-            } else {
-                figuresForYear.forEach(fig => {
-                    const figEl = document.createElement('div');
-                    figEl.className = 'flex items-center justify-between p-3 bg-white border rounded-md';
-                    figEl.innerHTML = `
-                        <div class="flex items-center space-x-3">
-                            <img src="${escapeHTML(fig.imageUrl)}" alt="${escapeHTML(fig.name)}" class="w-12 h-12 object-cover rounded-md border" onerror="this.src='https://placehold.co/50x50?text=Img'">
-                            <span class="text-base font-medium text-gray-700">${escapeHTML(fig.name)}</span>
-                        </div>
-                        <button class="btn-delete-figure-modal ml-4 px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-md hover:bg-red-200"
-                                data-id="${fig.id}">
-                            Delete
-                        </button>
-                    `;
-                    analysisFiguresList.appendChild(figEl);
-                });
-            }
-        }
-        
-        // --- EVENT LISTENER SETUP ---
-
-        /**
-         * Sets up global event listeners for buttons and modal.
-         */
-        function setupEventListeners() {
-            // --- Timeline Listeners ---
-            timelineContainer.addEventListener('click', (e) => {
-                const target = e.target;
-                
-                if (target.classList.contains('btn-add')) {
-                    if (!activeTimelineId) return; // NEW Guard
-                    const { year, month } = target.dataset;
-                    openModalForAdd(year, month);
-                } 
-                else if (target.classList.contains('btn-edit')) {
-                    if (!activeTimelineId) return; // NEW Guard
-                    const { year, month, id } = target.dataset;
-                    openModalForEdit(year, month, id);
-                }
-                else if (target.classList.contains('btn-delete')) {
-                    if (!activeTimelineId) return; // NEW Guard
-                    const { id } = target.dataset;
-                    handleDelete(id);
-                }
-            });
-            
-            // --- Header Listeners ---
-            compactToggle.addEventListener('change', () => {
-                const isChecked = compactToggle.checked;
-                timelineContainer.classList.toggle('compact-view', isChecked);
-                updateYearBlockVisibility(isChecked);
-                renderContextBars(); 
-            });
-            
-            contextToggle.addEventListener('change', () => {
-                timelineContainer.classList.toggle('show-context', contextToggle.checked);
-            });
-            
-            manageContextBtn.addEventListener('click', () => {
-                if (!activeTimelineId) return; // NEW Guard
-                contextModal.showModal();
-            });
-            
-            tagFilterInput.addEventListener('input', applyTagFilter);
-            
-            // NEW: Listen for window resize to update sticky top
-            window.addEventListener('resize', updateStickyTop);
-
-            // --- Notes Modal Listeners ---
-            modalForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                handleSave();
-            });
-            modalCancel.addEventListener('click', () => modal.close());
-            modalEventType.addEventListener('change', () => {
-                const type = modalEventType.value;
-                modalDurationFields.classList.toggle('hidden', type === 'single');
-                modalEventColorWrapper.classList.toggle('hidden', type !== 'start');
-                colorPreview.style.display = (type === 'start') ? 'inline-block' : 'none';
-            });
-            modalEventColor.addEventListener('input', () => {
-                colorPreview.style.backgroundColor = modalEventColor.value;
-            });
-            addNoteEntryBtn.addEventListener('click', () => createNoteEntry());
-            notesContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('btn-remove-note')) {
-                    e.target.closest('.note-entry-group').remove();
-                }
-            });
-            
-            // --- Context Modal Listeners ---
-            contextModalClose.addEventListener('click', () => contextModal.close());
-            contextForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                handleSaveContext();
-            });
-            contextList.addEventListener('click', (e) => {
-                if (e.target.classList.contains('btn-delete-context')) {
-                    const id = e.target.dataset.id;
-                    handleDeleteContext(id);
-                }
-            });
-            
-            // --- UPDATED: Sidebar Listeners (for new tooltip) ---
-            const globalTooltip = document.getElementById('global-tooltip');
-
-            keyFiguresContainer.addEventListener('mouseover', (e) => {
-                const figureItem = e.target.closest('.figure-item');
-                if (!figureItem || !globalTooltip) return;
-
-                const description = figureItem.dataset.description;
-                if (!description) return;
-
-                // 1. Populate and set horizontal position
-                globalTooltip.innerHTML = description;
-                const rect = figureItem.getBoundingClientRect();
-                globalTooltip.style.left = `${rect.left + (rect.width / 2)}px`;
-
-                // 2. Show hidden to measure
-                globalTooltip.style.visibility = 'hidden';
-                globalTooltip.style.opacity = '1';
-
-                // 3. Measure height
-                const tooltipHeight = globalTooltip.offsetHeight;
-                
-                // 4. Check if it will be cut off (with a 10px buffer)
-                if (rect.bottom + tooltipHeight + 10 > window.innerHeight) {
-                    // Position above
-                    globalTooltip.style.top = `${rect.top - tooltipHeight - 10}px`;
-                    globalTooltip.style.transform = 'translate(-50%, -10px)'; // Adjust transform for above
-                } else {
-                    // Position below
-                    globalTooltip.style.top = `${rect.bottom}px`;
-                    globalTooltip.style.transform = 'translate(-50%, 10px)'; // Adjust transform for below
-                }
-
-                // 5. Make visible
-                globalTooltip.style.visibility = 'visible';
-            });
-
-            keyFiguresContainer.addEventListener('mouseout', (e) => {
-                const figureItem = e.target.closest('.figure-item');
-                if (!figureItem || !globalTooltip) return;
-
-                // Hide the tooltip
-                globalTooltip.style.opacity = '0';
-                globalTooltip.style.visibility = 'hidden';
-            });
-            
-            // --- Figure Modal Listeners (Deprecated) ---
-            figureModalCancel.addEventListener('click', () => figureModal.close());
-            figureForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                // handleSaveFigure(); // This form is no longer used
-            });
-            figureImageUrl.addEventListener('input', () => {
-                figurePreview.src = figureImageUrl.value || 'https://placehold.co/100x100?text=Preview';
-            });
-            
-            // --- NEW: UI Modal Listeners ---
-            manageUiBtn.addEventListener('click', () => uiModal.showModal());
-            uiModalClose.addEventListener('click', () => uiModal.close());
-            
-            // Helper to update a CSS var, localStorage, and a text display
-            const createSliderListener = (slider, valueDisplay, storageKey, cssVar, unit = '%', unitless = false) => { // NEW: unitless flag
-                slider.addEventListener('input', (e) => {
-                    const value = e.target.value;
-                    const displayValue = unitless ? value : `${value}${unit}`;
-                    document.documentElement.style.setProperty(cssVar, displayValue);
-                    valueDisplay.textContent = displayValue;
-                    localStorage.setItem(storageKey, value);
-                    // DELETED Special case for sidebar margins
-                });
-            };
-
-            createSliderListener(globalScaleSlider, globalScaleValue, 'uiScale', 'font-size', '%');
-            createSliderListener(layoutGapSlider, layoutGapValue, 'uiGap', '--main-gap', 'rem');
-            createSliderListener(lineHeightSlider, lineHeightValue, 'uiLineHeight', '--global-line-height', '', true); // NEW
-            createSliderListener(verticalSpacingSlider, verticalSpacingValue, 'uiSpacing', '--timeline-v-spacing', 'rem');
-            createSliderListener(yearHeaderFsSlider, yearHeaderFsValue, 'uiYearHeaderFs', '--timeline-year-fs', 'rem');
-            createSliderListener(monthCardFsSlider, monthCardFsValue, 'uiMonthCardFs', '--timeline-card-fs', 'rem');
-            createSliderListener(sidebarTitleFsSlider, sidebarTitleFsValue, 'uiSidebarTitleFs', '--sidebar-title-fs', 'rem');
-            createSliderListener(sidebarBodyFsSlider, sidebarBodyFsValue, 'uiSidebarBodyFs', '--sidebar-body-fs', 'rem');
-            createSliderListener(modalTitleFsSlider, modalTitleFsValue, 'uiModalTitleFs', '--modal-title-fs', 'rem');
-            createSliderListener(modalBodyFsSlider, modalBodyFsValue, 'uiModalBodyFs', '--modal-body-fs', 'rem');
-            // --- NEW Padding Listeners ---
-            createSliderListener(monthCardPadYSlider, monthCardPadYValue, 'uiCardPadY', '--card-padding-y', 'rem');
-            createSliderListener(monthCardPadXSlider, monthCardPadXValue, 'uiCardPadX', '--card-padding-x', 'rem');
-            createSliderListener(sidebarPadYSlider, sidebarPadYValue, 'uiSidebarPadY', '--sidebar-padding-y', 'rem');
-            createSliderListener(sidebarPadXSlider, sidebarPadXValue, 'uiSidebarPadX', '--sidebar-padding-x', 'rem');
-            createSliderListener(modalPadYSlider, modalPadYValue, 'uiModalPadY', '--modal-padding-y', 'rem');
-            createSliderListener(modalPadXSlider, modalPadXValue, 'uiModalPadX', '--modal-padding-x', 'rem');
-            // --- DELETED Margin Listeners ---
-
-
-            uiResetBtn.addEventListener('click', () => {
-                // List of all settings [slider, storageKey, cssVar, defaultValue, unit, unitless]
-                const allSettings = [
-                    [globalScaleSlider, 'uiScale', 'font-size', 100, '%', false],
-                    [layoutGapSlider, 'uiGap', '--main-gap', 3, 'rem', false], // New Default
-                    [lineHeightSlider, 'uiLineHeight', '--global-line-height', 1.6, '', true], // NEW
-                    [verticalSpacingSlider, 'uiSpacing', '--timeline-v-spacing', 2, 'rem', false],
-                    [yearHeaderFsSlider, 'uiYearHeaderFs', '--timeline-year-fs', 2.25, 'rem', false],
-                    [monthCardFsSlider, 'uiMonthCardFs', '--timeline-card-fs', 1, 'rem', false],
-                    [sidebarTitleFsSlider, 'uiSidebarTitleFs', '--sidebar-title-fs', 3.75, 'rem', false], // 200% default
-                    [sidebarBodyFsSlider, 'uiSidebarBodyFs', '--sidebar-body-fs', 2, 'rem', false], // 200% default
-                    [modalTitleFsSlider, 'uiModalTitleFs', '--modal-title-fs', 1.875, 'rem', false],
-                    [modalBodyFsSlider, 'uiModalBodyFs', '--modal-body-fs', 1, 'rem', false],
-                    // --- NEW Padding/Margin Resets ---
-                    [monthCardPadYSlider, 'uiCardPadY', '--card-padding-y', 1.5, 'rem', false],
-                    [monthCardPadXSlider, 'uiCardPadX', '--card-padding-x', 1.5, 'rem', false],
-                    [sidebarPadYSlider, 'uiSidebarPadY', '--sidebar-padding-y', 1.5, 'rem', false],
-                    [sidebarPadXSlider, 'uiSidebarPadX', '--sidebar-padding-x', 1.5, 'rem', false],
-                    [modalPadYSlider, 'uiModalPadY', '--modal-padding-y', 2, 'rem', false],
-                    [modalPadXSlider, 'uiModalPadX', '--modal-padding-x', 2, 'rem', false],
-                    // --- DELETED Margin Resets ---
-                ];
-                
-                allSettings.forEach(([slider, key, cssVar, value, unit, unitless]) => {
-                    localStorage.removeItem(key);
-                    const displayValue = unitless ? value : `${value}${unit}`;
-                    document.documentElement.style.setProperty(cssVar, displayValue);
-                    slider.value = value;
-                    // Find the corresponding value display element
-                    const valueDisplay = document.getElementById(slider.id.replace('Slider', 'Value'));
-                    if (valueDisplay) valueDisplay.textContent = displayValue;
-                    // DELETED Special case for sidebar margins
-                });
-            });
-            
-            // --- NEW Analysis Modal Listeners ---
-            manageAnalysisBtn.addEventListener('click', () => {
-                if (!activeTimelineId) return; // NEW Guard
-                updateAnalysisModal(analysisYearSelect.value); // Ensure it's up to date
-                analysisModal.showModal();
-                // NEW: Reset image preview on open
-                analysisFigurePreview.src = 'https://placehold.co/100x100?text=Preview';
-            });
-            analysisModalClose.addEventListener('click', () => analysisModal.close());
-            analysisYearSelect.addEventListener('change', (e) => {
-                updateAnalysisModal(e.target.value);
-            });
-            analysisSaveSummaryBtn.addEventListener('click', handleSaveSummary);
-            analysisFigureForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                handleSaveFigure();
-            });
-            // NEW: Image preview listener
-            analysisFigureImageUrl.addEventListener('input', () => {
-                const url = analysisFigureImageUrl.value.trim();
-                analysisFigurePreview.src = url || 'https://placehold.co/100x100?text=Preview';
-            });
-            analysisFiguresList.addEventListener('click', (e) => {
-                if (e.target.classList.contains('btn-delete-figure-modal')) {
-                    const id = e.target.dataset.id;
-                    handleDeleteFigure(id);
-                }
-            });
-
-            // --- NEW: Timeline Range Modal Listeners ---
-            createTimelineBtn.addEventListener('click', () => {
-                // MODIFIED: Clear form, don't pre-fill
-                timelineRangeForm.reset(); 
-                timelineRangeModal.showModal();
-            });
-            timelineRangeCancel.addEventListener('click', () => timelineRangeModal.close());
-            timelineRangeForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                handleSaveNewTimeline(); // MODIFIED function name
-            });
-
-            // --- NEW: Manage Timelines Modal Listeners ---
-            manageTimelinesBtn.addEventListener('click', () => {
-                manageTimelinesModal.showModal();
-            });
-            manageTimelinesClose.addEventListener('click', () => {
-                manageTimelinesModal.close();
-            });
-            manageTimelinesList.addEventListener('click', (e) => {
-                const target = e.target;
-                if (target.classList.contains('btn-activate-timeline')) {
-                    const timelineId = target.dataset.id;
-                    const timelineData = allTimelines.find(t => t.id === timelineId);
-                    if (timelineData) {
-                        activateTimeline(timelineId, timelineData);
-                        manageTimelinesModal.close();
+                    if (prevYearEl) {
+                        const headerHeight = header.offsetHeight;
+                        const elTop = prevYearEl.getBoundingClientRect().top + window.scrollY;
+                        // Scroll to the top of the element, minus the header height and a 20px buffer
+                        window.scrollTo({ top: elTop - headerHeight - 20, behavior: 'smooth' });
                     }
-                } else if (target.classList.contains('btn-delete-timeline')) {
-                    const timelineId = target.dataset.id;
-                    const timelineData = allTimelines.find(t => t.id === timelineId);
-                    if (timelineData) {
-                        // Simple confirm, replace with better modal later if needed
-                        if (confirm(`Are you sure you want to delete "${timelineData.name}"? This cannot be undone.`)) {
-                            handleDeleteTimeline(timelineId);
-                        }
+                } catch (e) {
+                    console.error("Error navigating to previous year:", e);
+                }
+            });
+
+            goToNextYearBtn.addEventListener('click', () => {
+                if (!activeTimelineId) return;
+                try {
+                    let current = parseInt(currentActiveYear);
+                    if (current >= END_YEAR) return; // Already at end
+
+                    let nextYear = current + 1;
+                    const nextYearEl = document.querySelector(`.year-block[data-year="${nextYear}"]`);
+                    
+                    if (nextYearEl) {
+                        const headerHeight = header.offsetHeight;
+                        const elTop = nextYearEl.getBoundingClientRect().top + window.scrollY;
+                        // Scroll to the top of the element, minus the header height and a 20px buffer
+                        window.scrollTo({ top: elTop - headerHeight - 20, behavior: 'smooth' });
                     }
+                } catch (e) {
+                    console.error("Error navigating to next year:", e);
                 }
             });
         }
