@@ -208,6 +208,8 @@
         #analysisModal > div { padding: var(--modal-padding-y) var(--modal-padding-x); }
         /* NEW: Added padding rule for new modal */
         #timelineRangeModal form { padding: var(--modal-padding-y) var(--modal-padding-x); }
+        /* NEW: Added padding rule for manage timelines modal */
+        #manageTimelinesModal > div { padding: var(--modal-padding-y) var(--modal-padding-x); }
 
 
         /* Styles for compact view */
@@ -462,6 +464,10 @@
                 <div class="flex items-center justify-between mt-4">
                     <div id="userInfo" class="text-sm text-gray-500 mt-2">Connecting...</div> <!-- Increased size -->
                     <div class="flex items-center space-x-4">
+                        <!-- NEW: Manage Timelines Button -->
+                        <button id="manageTimelinesBtn" class="px-4 py-2 bg-yellow-600 text-white text-base font-medium rounded-md hover:bg-yellow-700 transition-colors">
+                            Manage Timelines
+                        </button>
                         <!-- NEW: Create Timeline Button -->
                         <button id="createTimelineBtn" class="px-4 py-2 bg-green-600 text-white text-base font-medium rounded-md hover:bg-green-700 transition-colors">
                             Create Timeline
@@ -556,15 +562,40 @@
     </div> <!-- End .main-app-content -->
 
 
-    <!-- NEW: Timeline Range Modal Dialog -->
+    <!-- NEW: Manage Timelines Modal Dialog -->
+    <dialog id="manageTimelinesModal" class="p-0 rounded-lg shadow-xl w-full max-w-2xl">
+        <div class="p-8">
+            <h2 class="text-3xl font-semibold">Manage Timelines</h2>
+            <p class="text-lg text-gray-600">Activate or delete your saved timelines.</p>
+            
+            <div id="manageTimelinesList" class="mt-6 space-y-3 max-h-96 overflow-y-auto p-3 border rounded-md bg-gray-50">
+                <!-- Timeline list will be injected here -->
+                <p class="text-gray-500 italic text-base">Loading timelines...</p>
+            </div>
+            
+            <div class="mt-6 flex justify-end">
+                <button type="button" id="manageTimelinesClose" class="px-6 py-3 text-base bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </dialog>
+
+
+    <!-- MODIFIED: Timeline Range Modal Dialog -->
     <dialog id="timelineRangeModal" class="p-0 rounded-lg shadow-xl w-full max-w-md">
         <form id="timelineRangeForm" class="space-y-6">
             <div>
-                <h2 class="text-3xl font-semibold">Create Timeline</h2>
-                <p class="text-lg text-gray-600">Set the start and end year for your timeline.</p>
+                <h2 class="text-3xl font-semibold">Create New Timeline</h2>
+                <p class="text-lg text-gray-600">Set the name and year range for your new timeline.</p>
             </div>
             
             <div class="space-y-4">
+                <!-- NEW: Timeline Name Input -->
+                <div>
+                    <label for="timelineNameInput" class="block text-base font-medium text-gray-700 mb-1">Timeline Name</label>
+                    <input type="text" id="timelineNameInput" class="w-full p-3 text-base border border-gray-300 rounded-md" placeholder="e.g., BCS Preli Focus" required>
+                </div>
                 <div>
                     <label for="startYearInput" class="block text-base font-medium text-gray-700 mb-1">Start Year</label>
                     <input type="number" id="startYearInput" class="w-full p-3 text-base border border-gray-300 rounded-md" placeholder="e.g., 1947" required>
@@ -580,7 +611,7 @@
                     Cancel
                 </button>
                 <button type="submit" class="px-6 py-3 text-base bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
-                    Apply
+                    Create and Activate
                 </button>
             </div>
         </form>
@@ -741,27 +772,27 @@
         </div>
     </dialog>
 
-    <!-- Figure Modal Dialog -->
-    <dialog id="figureModal" class="p-0 rounded-lg shadow-xl w-full max-w-lg"> <!-- Increased size -->
-        <form id="figureForm" class="p-8 space-y-5"> <!-- Increased padding/spacing -->
-            <h2 class="text-2xl font-semibold">Add Key Figure for <span id="figure-modal-year">1947</span></h2> <!-- Increased size -->
+    <!-- Figure Modal Dialog (DEPRECATED - Now part of Analysis Modal) -->
+    <dialog id="figureModal" class="p-0 rounded-lg shadow-xl w-full max-w-lg">
+        <form id="figureForm" class="p-8 space-y-5"> 
+            <h2 class="text-2xl font-semibold">Add Key Figure for <span id="figure-modal-year">1947</span></h2>
             <input type="hidden" id="figure-year-hidden">
             <div>
-                <label for="figureName" class="block text-base font-medium text-gray-700 mb-1">Name</label> <!-- Increased size -->
-                <input type="text" id="figureName" class="w-full p-3 text-base border border-gray-300 rounded-md" required> <!-- Increased size -->
+                <label for="figureName" class="block text-base font-medium text-gray-700 mb-1">Name</label> 
+                <input type="text" id="figureName" class="w-full p-3 text-base border border-gray-300 rounded-md" required>
             </div>
             <div>
-                <label for="figureImageUrl" class="block text-base font-medium text-gray-700 mb-1">Image URL</label> <!-- Increased size -->
-                <input type="text" id="figureImageUrl" class="w-full p-3 text-base border border-gray-300 rounded-md" placeholder="https://... image link" required> <!-- Increased size -->
+                <label for="figureImageUrl" class="block text-base font-medium text-gray-700 mb-1">Image URL</label> 
+                <input type="text" id="figureImageUrl" class="w-full p-3 text-base border border-gray-300 rounded-md" placeholder="https://... image link" required>
                 <img id="figure-preview" src="https://placehold.co/100x100?text=Preview" alt="preview" class="w-24 h-24 object-cover mt-2 rounded-md border">
             </div>
             <div>
-                <label for="figureDescription" class="block text-base font-medium text-gray-700 mb-1">Description (for hover)</label> <!-- Increased size -->
-                <textarea id="figureDescription" class="w-full p-3 text-base border border-gray-300 rounded-md" rows="3" placeholder="e.g., Role in the Language Movement..." required></textarea> <!-- Increased size -->
+                <label for="figureDescription" class="block text-base font-medium text-gray-700 mb-1">Description (for hover)</label>
+                <textarea id="figureDescription" class="w-full p-3 text-base border border-gray-300 rounded-md" rows="3" placeholder="e.g., Role in the Language Movement..." required></textarea>
             </div>
             <div class="flex justify-end space-x-3">
-                <button type="button" id="figure-modal-cancel" class="px-5 py-3 text-base bg-gray-200 rounded-md hover:bg-gray-300">Cancel</button> <!-- Increased size -->
-                <button type="submit" class="px-5 py-3 text-base bg-emerald-600 text-white rounded-md hover:bg-emerald-700">Save Figure</button> <!-- Increased size -->
+                <button type="button" id="figure-modal-cancel" class="px-5 py-3 text-base bg-gray-200 rounded-md hover:bg-gray-300">Cancel</button>
+                <button type="submit" class="px-5 py-3 text-base bg-emerald-600 text-white rounded-md hover:bg-emerald-700">Save Figure</button>
             </div>
         </form>
     </dialog>
@@ -1065,23 +1096,31 @@
         let userId = null;
         let isAuthReady = false;
         
-        // --- Timeline State ---
+        // --- NEW: Multi-Timeline State ---
+        let timelinesRef = null; // Ref to users/{userId}/timelines
+        let unsubscribeTimelinesList = null;
+        let allTimelines = []; // Array of {id, name, startYear, endYear}
+        let activeTimelineId = null;
+
+        // --- Timeline State (Now depends on activeTimelineId) ---
         let timelineEventsRef = null;
         let unsubscribeTimeline = null; 
 
-        // --- Context Bar State ---
+        // --- Context Bar State (Now depends on activeTimelineId) ---
         let contextEventsRef = null;
         let unsubscribeContext = null;
         let allContextData = [];
         
-        // --- New Sidebar State ---
+        // --- New Sidebar State (Now depends on activeTimelineId) ---
         let summariesRef = null;
         let keyFiguresRef = null;
         let unsubscribeSummaries = null;
         let unsubscribeKeyFigures = null;
         let allSummaries = new Map(); // Map<year, summaryText>
         let allKeyFigures = []; // Array of figure objects
-        let currentActiveYear = '1947'; // Default year
+        
+        // MODIFIED: This is now set by the active timeline
+        let currentActiveYear = '1947'; 
         
         // NEW: IntersectionObserver for sticky year
         let yearObserver = null;
@@ -1225,9 +1264,16 @@
         const createTimelineBtn = document.getElementById('createTimelineBtn');
         const timelineRangeModal = document.getElementById('timelineRangeModal');
         const timelineRangeForm = document.getElementById('timelineRangeForm');
+        const timelineNameInput = document.getElementById('timelineNameInput'); // NEW
         const startYearInput = document.getElementById('startYearInput');
         const endYearInput = document.getElementById('endYearInput');
         const timelineRangeCancel = document.getElementById('timelineRangeCancel');
+
+        // --- NEW: Manage Timelines Modal Elements ---
+        const manageTimelinesBtn = document.getElementById('manageTimelinesBtn');
+        const manageTimelinesModal = document.getElementById('manageTimelinesModal');
+        const manageTimelinesList = document.getElementById('manageTimelinesList');
+        const manageTimelinesClose = document.getElementById('manageTimelinesClose');
 
 
         // --- INITIALIZATION ---
@@ -1301,38 +1347,31 @@
                     isAuthReady = true;
                     userInfo.textContent = `Signed in as: ${user.displayName || user.email}`;
                     
-                    // --- PART 2: Update database paths ---
-                    timelineEventsRef = collection(db, 'users', userId, 'timeline_events');
-                    contextEventsRef = collection(db, 'users', userId, 'political_context');
-                    summariesRef = collection(db, 'users', userId, 'year_summaries');
-                    keyFiguresRef = collection(db, 'users', userId, 'key_figures');
+                    // --- NEW: Set up main timelines ref ---
+                    timelinesRef = collection(db, 'users', userId, 'timelines');
+                    
+                    // --- NEW: Listen for the list of timelines ---
+                    // This will handle activating the correct timeline
+                    listenForTimelinesList(); 
                     // ------------------------------------
-
-                    await addInitialData();
-
-                    // --- Start all data listeners ---
-                    // MODIFIED: Use helper function
-                    initializeDataListeners();
-                    // --------------------------------
                     
                     // Show the app, hide the login
                     mainAppContent.style.display = 'block';
                     loginOverlay.style.display = 'none';
                     
                     // NEW: Set sticky top position
-                    updateStickyTop();
-                    
-                    // NEW: Update analysis modal for the default selected year
-                    updateAnalysisModal(analysisYearSelect.value);
+                    // MODIFIED: This is now called *after* a timeline is activated
+                    // updateStickyTop();
 
                 } else {
                     // --- User is SIGNED OUT ---
                     userId = null;
                     isAuthReady = false;
+                    activeTimelineId = null;
                     userInfo.textContent = "Please sign in.";
                     
                     // Stop all listeners
-                    // MODIFIED: Use helper function
+                    detachTimelinesListListener(); // NEW
                     detachDataListeners();
                     
                     // Hide the app, show the login
@@ -1366,10 +1405,11 @@
         
         /**
          * Checks if initial data exists and adds it if not.
-         * This ensures the user sees an example entry on first load.
+         * MODIFIED: This now operates on the *active* timeline.
          */
         async function addInitialData() {
-            if (!timelineEventsRef) return;
+            // NEW: Guard against running without an active timeline
+            if (!timelineEventsRef) return; 
             
             const flagDocRef = doc(timelineEventsRef, 'init_flag');
             
@@ -1377,12 +1417,12 @@
                 const flagDoc = await getDoc(flagDocRef);
                 if (!flagDoc.exists()) {
                     // New "notes object" format
+                    // MODIFIED: Add initial data to the *active* timeline's START_YEAR
                     await addDoc(timelineEventsRef, {
-                        year: 1947,
-                        month: "August",
+                        year: START_YEAR, // Use active timeline's start year
+                        month: "January",  // Use first month
                         info: [
-                            { day: "14", note: "Pakistan becomes an independent dominion.", tag: "partition" },
-                            { day: "15", note: "Partition of British India. East Bengal becomes part of Pakistan.", tag: "partition" }
+                            { day: "1", note: "Welcome to your new timeline! Add your first note.", tag: "example" }
                         ],
                         eventType: "single"
                     });
@@ -1403,6 +1443,12 @@
             
             // Re-add the context bar container which was cleared
             timelineContainer.innerHTML = '<div id="context-bar-container"></div>';
+
+            // NEW: Handle state with no active timeline
+            if (!activeTimelineId) {
+                timelineContainer.innerHTML += `<p class="text-center text-xl text-gray-500 p-10">No timeline selected. Click "Manage Timelines" to activate one, or "Create Timeline" to make a new one.</p>`;
+                return;
+            }
 
             // MODIFIED: Uses global START_YEAR and END_YEAR
             for (let year = START_YEAR; year <= END_YEAR; year++) {
@@ -1507,10 +1553,10 @@
             }
         }
 
-        // --- NEW: DATA LISTENER HELPER FUNCTIONS ---
+            // --- NEW: DATA LISTENER HELPER FUNCTIONS ---
 
         /**
-         * NEW: Detaches all active Firestore listeners.
+         * NEW: Detaches all active Firestore listeners for a specific timeline.
          */
         function detachDataListeners() {
             if (unsubscribeTimeline) unsubscribeTimeline();
@@ -1524,10 +1570,19 @@
         }
 
         /**
-         * NEW: Initializes all Firestore listeners.
+         * NEW: Detaches the main timelines list listener.
+         */
+        function detachTimelinesListListener() {
+            if (unsubscribeTimelinesList) unsubscribeTimelinesList();
+            unsubscribeTimelinesList = null;
+        }
+
+        /**
+         * NEW: Initializes all Firestore listeners for the active timeline.
          */
         function initializeDataListeners() {
-            if (!isAuthReady) return; // Guard
+            // NEW: Guard against running without an active timeline
+            if (!isAuthReady || !activeTimelineId) return; 
             
             listenForTimelineData();
             listenForContextData();
@@ -1536,6 +1591,97 @@
         }
 
         // --- DATA LISTENER FUNCTIONS ---
+
+        /**
+         * NEW: Listens for the user's list of timelines.
+         */
+        function listenForTimelinesList() {
+            if (!isAuthReady || !timelinesRef) return;
+            if (unsubscribeTimelinesList) unsubscribeTimelinesList();
+
+            unsubscribeTimelinesList = onSnapshot(timelinesRef, (snapshot) => {
+                allTimelines = [];
+                snapshot.forEach(doc => {
+                    allTimelines.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Sort timelines by name
+                allTimelines.sort((a, b) => a.name.localeCompare(b.name));
+
+                renderTimelinesListInModal();
+
+                // Determine which timeline to activate
+                let newActiveId = localStorage.getItem('activeTimelineId');
+                let timelineData = allTimelines.find(t => t.id === newActiveId);
+
+                if (!timelineData) {
+                    // If stored ID is invalid or not found, pick the first one
+                    timelineData = allTimelines[0]; 
+                    newActiveId = timelineData ? timelineData.id : null;
+                }
+
+                if (newActiveId) {
+                    // We have a timeline to activate
+                    // MODIFIED: Always activate to ensure data consistency,
+                    // even if ID is the same but data (e.g., year) *could* have changed.
+                    // This is simpler than deep-checking.
+                    activateTimeline(newActiveId, timelineData);
+                    
+                } else {
+                    // No timelines exist for this user
+                    activeTimelineId = null;
+                    detachDataListeners();
+                    renderTimelineStructure(); // Show "No timeline" message
+                    headerFocus.textContent = "No Timeline";
+                    currentActiveYear = "----";
+                    updateSidebarContent("----");
+                }
+            });
+        }
+
+        /**
+         * NEW: Activates a specific timeline, setting all refs and reloading data.
+         */
+        async function activateTimeline(timelineId, timelineData) {
+            if (!timelineId || !timelineData) return;
+
+            // if (activeTimelineId === timelineId) return; // Already active (REMOVED this check)
+
+            activeTimelineId = timelineId;
+            localStorage.setItem('activeTimelineId', timelineId);
+
+            // Detach old listeners
+            detachDataListeners();
+
+            // Set new global refs based on the active timeline
+            timelineEventsRef = collection(db, 'users', userId, 'timelines', activeTimelineId, 'timeline_events');
+            contextEventsRef = collection(db, 'users', userId, 'timelines', activeTimelineId, 'political_context');
+            summariesRef = collection(db, 'users', userId, 'timelines', activeTimelineId, 'year_summaries');
+            keyFiguresRef = collection(db, 'users', userId, 'timelines', activeTimelineId, 'key_figures');
+
+            // Update global year range
+            START_YEAR = parseInt(timelineData.startYear);
+            END_YEAR = parseInt(timelineData.endYear);
+            currentActiveYear = timelineData.startYear.toString();
+
+            // Update header
+            headerFocus.textContent = `${timelineData.name} (${START_YEAR} - ${END_YEAR})`;
+
+            // Re-render everything
+            renderTimelineStructure();
+            populateAnalysisYearDropdown();
+            populateContextDateDropdowns();
+            updateStickyTop();
+            
+            // Add initial "Welcome" note if this is a brand new timeline
+            await addInitialData(); 
+
+            // Attach listeners to new refs
+            initializeDataListeners(); 
+
+            // Update sidebar to new default year
+            updateSidebarContent(currentActiveYear);
+        }
 
         /**
          * Listens for real-time data from Firestore and updates the UI.
@@ -1894,6 +2040,40 @@
                 </div>
             `).join('');
         }
+
+        /**
+         * NEW: Renders the list of timelines in the management modal.
+         */
+        function renderTimelinesListInModal() {
+            if (allTimelines.length === 0) {
+                manageTimelinesList.innerHTML = `<p class="text-gray-500 italic text-base">No timelines created yet.</p>`;
+                return;
+            }
+
+            manageTimelinesList.innerHTML = allTimelines.map(timeline => {
+                const isActive = timeline.id === activeTimelineId;
+                return `
+                <div class="flex items-center justify-between p-3 ${isActive ? 'bg-green-50 border-green-300' : 'bg-white border'} rounded-md">
+                    <div class="flex-1">
+                        <span class="font-medium text-base">${escapeHTML(timeline.name)}</span>
+                        <span class="text-sm text-gray-500 block">
+                            (${timeline.startYear} - ${timeline.endYear})
+                            ${isActive ? '<span class="ml-2 font-bold text-green-700">(Active)</span>' : ''}
+                        </span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="btn-activate-timeline px-4 py-2 bg-green-100 text-green-700 text-base font-medium rounded-md hover:bg-green-200 transition-colors"
+                                data-id="${timeline.id}" ${isActive ? 'disabled' : ''}>
+                            ${isActive ? 'Active' : 'Activate'}
+                        </button>
+                        <button class="btn-delete-timeline ml-2 px-4 py-2 bg-red-100 text-red-700 text-base font-medium rounded-md hover:bg-red-200 transition-colors"
+                                data-id="${timeline.id}">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            `}).join('');
+        }
         
         /**
          * Resets all month items to their default "empty" state.
@@ -1939,7 +2119,15 @@
                 currentActiveYear = year;
             }
             
-            if (!year) return;
+            if (!year || !activeTimelineId) {
+                // NEW: Handle no active timeline
+                sidebarYear.textContent = "----";
+                summaryDisplay.innerHTML = `<p class="text-gray-500 italic text-base">No timeline active.</p>`;
+                keyFiguresContainer.innerHTML = '';
+                keyFiguresContainer.appendChild(keyFiguresPlaceholder);
+                keyFiguresPlaceholder.style.display = 'block';
+                return;
+            };
             
             // 1. Update Title
             sidebarYear.textContent = year;
@@ -1979,7 +2167,17 @@
          * NEW: Updates the content of the Analysis Modal based on the selected year.
          */
         function updateAnalysisModal(year) {
-            if (!year) return;
+            if (!year || !activeTimelineId) {
+                analysisSummaryTextarea.value = "";
+                analysisSummaryTextarea.disabled = true;
+                analysisFigureForm.reset();
+                analysisFigureForm.disabled = true;
+                analysisFiguresList.innerHTML = `<p class="text-gray-500 italic text-base">No timeline active.</p>`;
+                return;
+            };
+
+            analysisSummaryTextarea.disabled = false;
+            analysisFigureForm.disabled = false;
             
             // 1. Update Summary Textarea
             const summary = allSummaries.get(year) || '';
@@ -2021,14 +2219,17 @@
                 const target = e.target;
                 
                 if (target.classList.contains('btn-add')) {
+                    if (!activeTimelineId) return; // NEW Guard
                     const { year, month } = target.dataset;
                     openModalForAdd(year, month);
                 } 
                 else if (target.classList.contains('btn-edit')) {
+                    if (!activeTimelineId) return; // NEW Guard
                     const { year, month, id } = target.dataset;
                     openModalForEdit(year, month, id);
                 }
                 else if (target.classList.contains('btn-delete')) {
+                    if (!activeTimelineId) return; // NEW Guard
                     const { id } = target.dataset;
                     handleDelete(id);
                 }
@@ -2047,6 +2248,7 @@
             });
             
             manageContextBtn.addEventListener('click', () => {
+                if (!activeTimelineId) return; // NEW Guard
                 contextModal.showModal();
             });
             
@@ -2219,6 +2421,7 @@
             
             // --- NEW Analysis Modal Listeners ---
             manageAnalysisBtn.addEventListener('click', () => {
+                if (!activeTimelineId) return; // NEW Guard
                 updateAnalysisModal(analysisYearSelect.value); // Ensure it's up to date
                 analysisModal.showModal();
                 // NEW: Reset image preview on open
@@ -2247,14 +2450,42 @@
 
             // --- NEW: Timeline Range Modal Listeners ---
             createTimelineBtn.addEventListener('click', () => {
-                startYearInput.value = START_YEAR;
-                endYearInput.value = END_YEAR;
+                // MODIFIED: Clear form, don't pre-fill
+                timelineRangeForm.reset(); 
                 timelineRangeModal.showModal();
             });
             timelineRangeCancel.addEventListener('click', () => timelineRangeModal.close());
             timelineRangeForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                handleCreateTimeline();
+                handleSaveNewTimeline(); // MODIFIED function name
+            });
+
+            // --- NEW: Manage Timelines Modal Listeners ---
+            manageTimelinesBtn.addEventListener('click', () => {
+                manageTimelinesModal.showModal();
+            });
+            manageTimelinesClose.addEventListener('click', () => {
+                manageTimelinesModal.close();
+            });
+            manageTimelinesList.addEventListener('click', (e) => {
+                const target = e.target;
+                if (target.classList.contains('btn-activate-timeline')) {
+                    const timelineId = target.dataset.id;
+                    const timelineData = allTimelines.find(t => t.id === timelineId);
+                    if (timelineData) {
+                        activateTimeline(timelineId, timelineData);
+                        manageTimelinesModal.close();
+                    }
+                } else if (target.classList.contains('btn-delete-timeline')) {
+                    const timelineId = target.dataset.id;
+                    const timelineData = allTimelines.find(t => t.id === timelineId);
+                    if (timelineData) {
+                        // Simple confirm, replace with better modal later if needed
+                        if (confirm(`Are you sure you want to delete "${timelineData.name}"? This cannot be undone.`)) {
+                            handleDeleteTimeline(timelineId);
+                        }
+                    }
+                }
             });
         }
         
@@ -2357,42 +2588,45 @@
         // --- MODAL/FORM HANDLER FUNCTIONS ---
 
         /**
-         * NEW: Handles the creation of a new timeline range.
+         * NEW: Handles saving a new timeline.
          */
-        function handleCreateTimeline() {
+        async function handleSaveNewTimeline() {
+            if (!timelinesRef) return; // Guard
+
+            const timelineName = timelineNameInput.value.trim();
             const newStart = parseInt(startYearInput.value);
             const newEnd = parseInt(endYearInput.value);
 
+            if (!timelineName) {
+                console.error("Timeline name is required.");
+                timelineNameInput.focus();
+                return;
+            }
             if (isNaN(newStart) || isNaN(newEnd) || newStart > newEnd) {
                 console.error("Invalid year range.");
-                // You could add an error message to the modal here
+                startYearInput.focus();
                 return;
             }
 
-            START_YEAR = newStart;
-            END_YEAR = newEnd;
-            headerFocus.textContent = `Focus: ${START_YEAR} - ${END_YEAR}`;
-            
-            // 1. Detach old listeners
-            detachDataListeners();
-            
-            // 2. Re-render skeleton
-            renderTimelineStructure(); // This clears the timeline container
-            
-            // 3. Re-populate dropdowns
-            populateContextDateDropdowns();
-            populateAnalysisYearDropdown(); 
-            
-            // 4. Update sticky positions and re-init observer
-            updateStickyTop();
-            
-            // 5. Re-attach listeners which will fetch and populate the new skeleton
-            initializeDataListeners();
-            
-            // 6. Update sidebar to the new default year
-            updateSidebarContent(START_YEAR.toString());
-            
-            timelineRangeModal.close();
+            const timelineData = {
+                name: timelineName,
+                startYear: newStart,
+                endYear: newEnd
+            };
+
+            try {
+                const newTimelineDocRef = await addDoc(timelinesRef, timelineData);
+                // `listenForTimelinesList` will see this new doc and automatically
+                // activate it (since it will be the only one without a stored active ID,
+                // or if it's the first, it will be selected).
+                // To be more explicit, we can just activate it directly.
+                activateTimeline(newTimelineDocRef.id, timelineData);
+                
+                timelineRangeModal.close();
+                timelineRangeForm.reset();
+            } catch (error) {
+                console.error("Error creating new timeline:", error);
+            }
         }
 
         /**
@@ -2551,6 +2785,23 @@
                 await deleteDoc(doc(contextEventsRef, docId));
             } catch (error) {
                 console.error("Error deleting context:", error);
+            }
+        }
+
+        /**
+         * NEW: Handles deleting a timeline.
+         * Note: This only deletes the main timeline doc, not all subcollections.
+         * For a full cascade delete, a Firebase Function would be required.
+         */
+        async function handleDeleteTimeline(timelineId) {
+            if (!timelineId || !timelinesRef) return;
+            try {
+                await deleteDoc(doc(timelinesRef, timelineId));
+                // The onSnapshot listener for the timelines list will automatically
+                // trigger and handle re-activating a different timeline or
+                // showing the "no timelines" state.
+            } catch (error) {
+                console.error("Error deleting timeline:", error);
             }
         }
 
