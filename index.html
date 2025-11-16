@@ -12,6 +12,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Custom styles */
+        
+        /* NEW: CSS Variables for UI Control */
+        :root {
+            /* Global */
+            font-size: var(--global-scale, 100%); /* Controlled by JS */
+            --main-gap: var(--layout-gap, 5rem); /* Controlled by JS */
+            
+            /* Timeline */
+            --timeline-v-spacing: var(--month-spacing, 2rem); /* Controlled by JS */
+            --timeline-h-padding: 3rem; /* Stays proportional to global scale */
+            --timeline-year-fs: var(--year-header-fs, 2.25rem); /* Controlled by JS */
+            --timeline-card-fs: var(--month-card-fs, 1rem); /* Controlled by JS */
+            
+            /* Sidebar */
+            --sidebar-title-fs: var(--side-title-fs, 1.875rem); /* Controlled by JS */
+            --sidebar-body-fs: var(--side-body-fs, 1rem); /* Controlled by JS */
+            
+            /* Modals */
+            --modal-title-fs: var(--pop-title-fs, 1.875rem); /* Controlled by JS */
+            --modal-body-fs: var(--pop-body-fs, 1rem); /* Controlled by JS */
+        }
+        
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f4f7f6; /* A very light, calming green-gray */
@@ -47,7 +69,7 @@
             top: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 6px; /* Increased */
+            width: 6px; 
             height: 100%;
             background-color: #cbd5e1; /* slate-300 */
             z-index: 2; 
@@ -56,7 +78,10 @@
         /* Styling for each year block */
         .year-block {
             position: relative;
-            padding: 2.5rem 0; /* Increased */
+            padding: 2.5rem 0; 
+        }
+        .year-block span {
+             font-size: var(--timeline-year-fs);
         }
 
         /* Styling for each month's "dot" on the timeline */
@@ -65,10 +90,10 @@
             top: 1.125rem; /* Adjusted for larger text */
             left: 50%;
             transform: translateX(-50%);
-            width: 24px; /* Increased */
-            height: 24px; /* Increased */
+            width: 24px; 
+            height: 24px; 
             background-color: white;
-            border: 5px solid #059669; /* Increased */
+            border: 5px solid #059669; 
             border-radius: 50%;
             z-index: 5; 
             transition: all 0.3s ease;
@@ -83,22 +108,29 @@
         .month-item {
             position: relative;
             width: 50%;
-            padding: 0 3rem; /* Increased */
-            margin-bottom: var(--month-spacing, 2rem); /* MODIFIED: Using CSS variable */
+            padding: 0 var(--timeline-h-padding);
+            margin-bottom: var(--timeline-v-spacing);
         }
 
         /* Even items on the right */
         .month-item:nth-child(even) {
             align-self: flex-end;
-            padding-left: 3rem; /* Increased */
+            padding-left: var(--timeline-h-padding);
         }
         
         /* Odd items on the left */
         .month-item:nth-child(odd) {
             align-self: flex-start;
-            padding-right: 3rem; /* Increased */
+            padding-right: var(--timeline-h-padding);
             text-align: right;
         }
+        
+        /* Month Card font size */
+        .month-card, .month-card h3, .month-card p, .month-card li, .month-card button {
+            font-size: var(--timeline-card-fs);
+        }
+        .month-card h3 { font-size: calc(var(--timeline-card-fs) * 1.25); font-weight: 600; } /* Make title slightly bigger */
+
 
         /* Adjust button alignment for left/right items */
         .month-item:nth-child(odd) .month-buttons {
@@ -114,8 +146,8 @@
             content: '';
             position: absolute;
             top: 1.375rem; /* Adjusted for dot */
-            width: 3rem; /* Increased */
-            height: 3px; /* Increased */
+            width: var(--timeline-h-padding);
+            height: 3px; 
             background: #cbd5e1; /* slate-300 */
             z-index: 2; 
         }
@@ -134,6 +166,13 @@
         dialog::backdrop {
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(2px);
+        }
+        
+        /* Modal font sizes */
+        dialog h2 { font-size: var(--modal-title-fs); }
+        dialog h3 { font-size: calc(var(--modal-body-fs) * 1.25); }
+        dialog p, dialog label, dialog button, dialog input, dialog select, dialog textarea {
+            font-size: var(--modal-body-fs);
         }
 
         /* Styles for compact view */
@@ -165,7 +204,7 @@
             position: absolute;
             left: calc(50% - 3px); /* Adjusted */
             transform: translateX(-100%); 
-            width: 8px; /* Increased */
+            width: 8px; 
             z-index: 3; 
             opacity: 0.8;
             transition: all 0.3s ease;
@@ -178,8 +217,8 @@
             position: absolute;
             left: 50%; 
             transform: translateX(-50%); 
-            width: 16px; /* Increased */
-            height: 8px; /* Increased */
+            width: 16px; 
+            height: 8px; 
             background-color: inherit; 
             z-index: 4; 
         }
@@ -195,8 +234,8 @@
         /* Color preview in modal */
         #colorPreview {
             display: inline-block;
-            width: 28px; /* Increased */
-            height: 28px; /* Increased */
+            width: 28px; 
+            height: 28px; 
             border-radius: 50%;
             border: 1px solid #ccc;
             vertical-align: middle;
@@ -223,7 +262,7 @@
             position: absolute;
             top: 0;
             height: 100%;
-            width: 12px; /* Increased */
+            width: 12px; 
             z-index: 1; 
             background-color: rgba(200, 200, 200, 0.2);
             border-radius: 5px;
@@ -263,13 +302,13 @@
             space-y: 1;
         }
         .month-content ul li {
-            padding: 12px 16px; /* Increased */
+            padding: 12px 16px; 
             background-color: #f8fafc;
             border-radius: 6px;
             border: 1px solid #e2e8f0;
             text-align: left; /* Ensure list items are left-aligned */
-            margin-bottom: 8px; /* Increased */
-            font-size: 1rem; /* text-base */
+            margin-bottom: 8px; 
+            /* font-size: 1rem; /* text-base */ /* Handled by --timeline-card-fs */
         }
         .month-content ul li:last-child {
             margin-bottom: 0;
@@ -282,23 +321,28 @@
         .note-day {
             font-weight: 700;
             color: #059669; /* emerald-600 */
-            font-size: 1rem; /* text-base */
+            /* font-size: 1rem; /* text-base */ /* Handled by --timeline-card-fs */
         }
         .note-tag {
-            font-size: 0.875rem; /* text-sm */
+            /* font-size: 0.875rem; /* text-sm */ /* Proportional */
             font-weight: 500;
             color: #4338ca; /* indigo-700 */
             background-color: #e0e7ff; /* indigo-100 */
-            padding: 3px 8px; /* Increased */
+            padding: 3px 8px; 
             border-radius: 4px;
             margin-left: 8px;
         }
         
         /* New Sidebar Styles */
         #sidebar-content {
-            /* top-32 (128px) to be below sticky header */
             position: sticky;
-            top: 180px; /* Increased */
+            top: 180px; 
+        }
+        
+        #sidebar-content h2 { font-size: var(--sidebar-title-fs); }
+        #sidebar-content h3 { font-size: calc(var(--sidebar-body-fs) * 1.25); }
+        #summary-display, #key-figures-container p, #key-figures-container .figure-item p {
+            font-size: var(--sidebar-body-fs);
         }
         
         #key-figures-container {
@@ -310,7 +354,6 @@
         #summary-display {
             min-height: 12rem; /* h-48 */
             padding: 0.75rem; /* p-3 */
-            font-size: 1rem; /* text-base */
             border: 1px solid #e5e7eb; /* border-gray-200 */
             border-radius: 0.375rem; /* rounded-md */
             background-color: #f9fafb; /* bg-gray-50 */
@@ -323,11 +366,11 @@
             position: absolute;
             top: -6px; /* Adjusted */
             right: -6px; /* Adjusted */
-            width: 24px; /* Increased */
-            height: 24px; /* Increased */
-            line-height: 24px; /* Increased */
+            width: 24px; 
+            height: 24px; 
+            line-height: 24px; 
             text-align: center;
-            font-size: 12px; /* Increased */
+            font-size: 12px; 
             font-weight: bold;
             border-radius: 50%;
             cursor: pointer;
@@ -425,7 +468,7 @@
         </header>
 
         <!-- Main Content - Changed to Grid Layout -->
-        <main class="container mx-auto max-w-screen-2xl py-16 px-6 grid grid-cols-1 lg:grid-cols-3 gap-20"> <!-- Increased max-width and gap -->
+        <main class="container mx-auto max-w-screen-2xl py-16 px-6 grid grid-cols-1 lg:grid-cols-3" style="gap: var(--main-gap);"> <!-- Increased max-width and gap -->
             
             <!-- Column 1: Timeline -->
             <div class="lg:col-span-2">
@@ -651,31 +694,102 @@
         </form>
     </dialog>
     
-    <!-- UI Settings Modal -->
-    <dialog id="uiModal" class="p-0 rounded-lg shadow-xl w-full max-w-md">
+    <!-- REBUILT: UI Settings Modal -->
+    <dialog id="uiModal" class="p-0 rounded-lg shadow-xl w-full max-w-2xl">
         <div class="p-8 space-y-6">
             <h2 class="text-3xl font-semibold">Manage UI Settings</h2>
             
-            <!-- Global Scale Slider -->
-            <div class="space-y-2">
-                <div class="flex justify-between items-center">
-                    <label for="globalScaleSlider" class="block text-base font-medium text-gray-700">Global Scale (Zoom)</label>
-                    <span id="globalScaleValue" class="range-value">100%</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Column 1 -->
+                <div class="space-y-6">
+                    <!-- Global Scale Slider -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="globalScaleSlider" class="block text-base font-medium text-gray-700">Global Scale (Zoom)</label>
+                            <span id="globalScaleValue" class="range-value">100%</span>
+                        </div>
+                        <input type="range" id="globalScaleSlider" min="80" max="130" value="100" class="w-full">
+                    </div>
+                    
+                    <!-- Timeline/Sidebar Gap -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="layoutGapSlider" class="block text-base font-medium text-gray-700">Timeline/Sidebar Gap</label>
+                            <span id="layoutGapValue" class="range-value">5rem</span>
+                        </div>
+                        <input type="range" id="layoutGapSlider" min="2" max="10" value="5" step="0.5" class="w-full">
+                    </div>
+
+                    <!-- Vertical Spacing Slider -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="verticalSpacingSlider" class="block text-base font-medium text-gray-700">Timeline Vertical Spacing</label>
+                            <span id="verticalSpacingValue" class="range-value">2rem</span>
+                        </div>
+                        <input type="range" id="verticalSpacingSlider" min="1" max="4" value="2" step="0.25" class="w-full">
+                    </div>
+                    
+                    <!-- Year Header Font Size -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="yearHeaderFsSlider" class="block text-base font-medium text-gray-700">Year Header Font</label>
+                            <span id="yearHeaderFsValue" class="range-value">2.25rem</span>
+                        </div>
+                        <input type="range" id="yearHeaderFsSlider" min="1.5" max="3" value="2.25" step="0.125" class="w-full">
+                    </div>
+
+                    <!-- Month Card Font Size -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="monthCardFsSlider" class="block text-base font-medium text-gray-700">Month Card Font</label>
+                            <span id="monthCardFsValue" class="range-value">1rem</span>
+                        </div>
+                        <input type="range" id="monthCardFsSlider" min="0.875" max="1.25" value="1" step="0.125" class="w-full">
+                    </div>
                 </div>
-                <input type="range" id="globalScaleSlider" min="80" max="130" value="100" class="w-full">
-            </div>
-            
-            <!-- Vertical Spacing Slider -->
-            <div class="space-y-2">
-                <div class="flex justify-between items-center">
-                    <label for="verticalSpacingSlider" class="block text-base font-medium text-gray-700">Vertical Spacing</label>
-                    <span id="verticalSpacingValue" class="range-value">2rem</span>
+                
+                <!-- Column 2 -->
+                <div class="space-y-6">
+                    <!-- Sidebar Title Font Size -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="sidebarTitleFsSlider" class="block text-base font-medium text-gray-700">Sidebar Title Font</label>
+                            <span id="sidebarTitleFsValue" class="range-value">1.875rem</span>
+                        </div>
+                        <input type="range" id="sidebarTitleFsSlider" min="1.25" max="2.5" value="1.875" step="0.125" class="w-full">
+                    </div>
+                    
+                    <!-- Sidebar Body Font Size -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="sidebarBodyFsSlider" class="block text-base font-medium text-gray-700">Sidebar Body Font</label>
+                            <span id="sidebarBodyFsValue" class="range-value">1rem</span>
+                        </div>
+                        <input type="range" id="sidebarBodyFsSlider" min="0.875" max="1.25" value="1" step="0.125" class="w-full">
+                    </div>
+                    
+                    <!-- Modal Title Font Size -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="modalTitleFsSlider" class="block text-base font-medium text-gray-700">Modal Title Font</label>
+                            <span id="modalTitleFsValue" class="range-value">1.875rem</span>
+                        </div>
+                        <input type="range" id="modalTitleFsSlider" min="1.25" max="2.5" value="1.875" step="0.125" class="w-full">
+                    </div>
+                    
+                    <!-- Modal Body Font Size -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <label for="modalBodyFsSlider" class="block text-base font-medium text-gray-700">Modal Body Font</label>
+                            <span id="modalBodyFsValue" class="range-value">1rem</span>
+                        </div>
+                        <input type="range" id="modalBodyFsSlider" min="0.875" max="1.25" value="1" step="0.125" class="w-full">
+                    </div>
                 </div>
-                <input type="range" id="verticalSpacingSlider" min="1" max="4" value="2" step="0.25" class="w-full">
             </div>
 
             <!-- Buttons -->
-            <div class="mt-6 flex justify-between space-x-3">
+            <div class="mt-8 flex justify-between space-x-3">
                 <button type="button" id="uiResetBtn" class="px-6 py-3 text-base bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors">
                     Reset to Default
                 </button>
@@ -874,9 +988,6 @@
         // --- New Sidebar DOM Elements ---
         const sidebarYear = document.getElementById('sidebar-year');
         const summaryDisplay = document.getElementById('summary-display'); // MODIFIED
-        // const summaryTextarea = document.getElementById('summary-textarea'); // REMOVED
-        // const saveSummaryBtn = document.getElementById('save-summary-btn'); // REMOVED
-        // const addFigureBtn = document.getElementById('add-figure-btn'); // REMOVED
         const keyFiguresContainer = document.getElementById('key-figures-container');
         const keyFiguresPlaceholder = document.getElementById('key-figures-placeholder');
         
@@ -897,16 +1008,30 @@
         const signOutBtn = document.getElementById('sign-out-btn');
         const mainAppContent = document.querySelector('.main-app-content');
         
-        // --- UI Modal Elements ---
+        // --- NEW: UI Modal Elements ---
         const manageUiBtn = document.getElementById('manageUiBtn');
         const uiModal = document.getElementById('uiModal');
         const uiModalClose = document.getElementById('uiModalClose');
         const uiResetBtn = document.getElementById('uiResetBtn');
         const globalScaleSlider = document.getElementById('globalScaleSlider');
         const globalScaleValue = document.getElementById('globalScaleValue');
+        const layoutGapSlider = document.getElementById('layoutGapSlider');
+        const layoutGapValue = document.getElementById('layoutGapValue');
         const verticalSpacingSlider = document.getElementById('verticalSpacingSlider');
         const verticalSpacingValue = document.getElementById('verticalSpacingValue');
-        
+        const yearHeaderFsSlider = document.getElementById('yearHeaderFsSlider');
+        const yearHeaderFsValue = document.getElementById('yearHeaderFsValue');
+        const monthCardFsSlider = document.getElementById('monthCardFsSlider');
+        const monthCardFsValue = document.getElementById('monthCardFsValue');
+        const sidebarTitleFsSlider = document.getElementById('sidebarTitleFsSlider');
+        const sidebarTitleFsValue = document.getElementById('sidebarTitleFsValue');
+        const sidebarBodyFsSlider = document.getElementById('sidebarBodyFsSlider');
+        const sidebarBodyFsValue = document.getElementById('sidebarBodyFsValue');
+        const modalTitleFsSlider = document.getElementById('modalTitleFsSlider');
+        const modalTitleFsValue = document.getElementById('modalTitleFsValue');
+        const modalBodyFsSlider = document.getElementById('modalBodyFsSlider');
+        const modalBodyFsValue = document.getElementById('modalBodyFsValue');
+
         // --- NEW Analysis Modal Elements ---
         const manageAnalysisBtn = document.getElementById('manageAnalysisBtn');
         const analysisModal = document.getElementById('analysisModal');
@@ -1553,9 +1678,7 @@
                     figEl.innerHTML = `
                         <img src="${escapeHTML(fig.imageUrl)}" alt="${escapeHTML(fig.name)}" class="w-full h-24 object-cover rounded-md border" onerror="this.src='https://placehold.co/100x100?text=Image'">
                         <p class="text-sm text-center font-medium truncate mt-1">${escapeHTML(fig.name)}</p>
-                        <button class="btn-delete-figure bg-red-600 text-white" data-id="${fig.id}">
-                            &times;
-                        </button>
+                        <!-- DELETED the delete button from here -->
                     `;
                     keyFiguresContainer.appendChild(figEl);
                 });
@@ -1674,55 +1797,72 @@
                 }
             });
             
-            // --- New Sidebar Listeners ---
-            // saveSummaryBtn.addEventListener('click', handleSaveSummary); // REMOVED
-            // addFigureBtn.addEventListener('click', handleAddFigure); // REMOVED
+            // --- Sidebar Listeners (for delete) ---
             keyFiguresContainer.addEventListener('click', (e) => {
                 if (e.target.classList.contains('btn-delete-figure')) {
-                    const id = e.target.dataset.id;
-                    handleDeleteFigure(id);
+                    // This button is no longer in the sidebar, but the listener is harmless.
+                    // Deletion is now handled by btn-delete-figure-modal in the analysis modal.
                 }
             });
             
-            // --- New Figure Modal Listeners ---
+            // --- Figure Modal Listeners (Deprecated) ---
             figureModalCancel.addEventListener('click', () => figureModal.close());
             figureForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                handleSaveFigure();
+                // handleSaveFigure(); // This form is no longer used
             });
             figureImageUrl.addEventListener('input', () => {
                 figurePreview.src = figureImageUrl.value || 'https://placehold.co/100x100?text=Preview';
             });
             
-            // --- UI Modal Listeners ---
+            // --- NEW: UI Modal Listeners ---
             manageUiBtn.addEventListener('click', () => uiModal.showModal());
             uiModalClose.addEventListener('click', () => uiModal.close());
             
-            globalScaleSlider.addEventListener('input', (e) => {
-                const scale = e.target.value;
-                document.documentElement.style.fontSize = `${scale}%`;
-                globalScaleValue.textContent = `${scale}%`;
-                localStorage.setItem('uiScale', scale);
-            });
-            
-            verticalSpacingSlider.addEventListener('input', (e) => {
-                const spacing = e.target.value;
-                document.documentElement.style.setProperty('--month-spacing', `${spacing}rem`);
-                verticalSpacingValue.textContent = `${spacing}rem`;
-                localStorage.setItem('uiSpacing', spacing);
-            });
-            
+            // Helper to update a CSS var, localStorage, and a text display
+            const createSliderListener = (slider, valueDisplay, storageKey, cssVar, unit = '%') => {
+                slider.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    const displayValue = `${value}${unit}`;
+                    document.documentElement.style.setProperty(cssVar, displayValue);
+                    valueDisplay.textContent = displayValue;
+                    localStorage.setItem(storageKey, value);
+                });
+            };
+
+            createSliderListener(globalScaleSlider, globalScaleValue, 'uiScale', 'font-size', '%');
+            createSliderListener(layoutGapSlider, layoutGapValue, 'uiGap', '--main-gap', 'rem');
+            createSliderListener(verticalSpacingSlider, verticalSpacingValue, 'uiSpacing', '--timeline-v-spacing', 'rem');
+            createSliderListener(yearHeaderFsSlider, yearHeaderFsValue, 'uiYearHeaderFs', '--timeline-year-fs', 'rem');
+            createSliderListener(monthCardFsSlider, monthCardFsValue, 'uiMonthCardFs', '--timeline-card-fs', 'rem');
+            createSliderListener(sidebarTitleFsSlider, sidebarTitleFsValue, 'uiSidebarTitleFs', '--sidebar-title-fs', 'rem');
+            createSliderListener(sidebarBodyFsSlider, sidebarBodyFsValue, 'uiSidebarBodyFs', '--sidebar-body-fs', 'rem');
+            createSliderListener(modalTitleFsSlider, modalTitleFsValue, 'uiModalTitleFs', '--modal-title-fs', 'rem');
+            createSliderListener(modalBodyFsSlider, modalBodyFsValue, 'uiModalBodyFs', '--modal-body-fs', 'rem');
+
             uiResetBtn.addEventListener('click', () => {
-                localStorage.removeItem('uiScale');
-                localStorage.removeItem('uiSpacing');
+                // List of all settings [slider, storageKey, cssVar, defaultValue, unit]
+                const allSettings = [
+                    [globalScaleSlider, 'uiScale', 'font-size', 100, '%'],
+                    [layoutGapSlider, 'uiGap', '--main-gap', 5, 'rem'],
+                    [verticalSpacingSlider, 'uiSpacing', '--timeline-v-spacing', 2, 'rem'],
+                    [yearHeaderFsSlider, 'uiYearHeaderFs', '--timeline-year-fs', 2.25, 'rem'],
+                    [monthCardFsSlider, 'uiMonthCardFs', '--timeline-card-fs', 1, 'rem'],
+                    [sidebarTitleFsSlider, 'uiSidebarTitleFs', '--sidebar-title-fs', 1.875, 'rem'],
+                    [sidebarBodyFsSlider, 'uiSidebarBodyFs', '--sidebar-body-fs', 1, 'rem'],
+                    [modalTitleFsSlider, 'uiModalTitleFs', '--modal-title-fs', 1.875, 'rem'],
+                    [modalBodyFsSlider, 'uiModalBodyFs', '--modal-body-fs', 1, 'rem']
+                ];
                 
-                document.documentElement.style.fontSize = '100%';
-                document.documentElement.style.setProperty('--month-spacing', '2rem');
-                
-                globalScaleSlider.value = 100;
-                globalScaleValue.textContent = '100%';
-                verticalSpacingSlider.value = 2;
-                verticalSpacingValue.textContent = '2rem';
+                allSettings.forEach(([slider, key, cssVar, value, unit]) => {
+                    localStorage.removeItem(key);
+                    const displayValue = `${value}${unit}`;
+                    document.documentElement.style.setProperty(cssVar, displayValue);
+                    slider.value = value;
+                    // Find the corresponding value display element
+                    const valueDisplay = document.getElementById(slider.id.replace('Slider', 'Value'));
+                    if (valueDisplay) valueDisplay.textContent = displayValue;
+                });
             });
             
             // --- NEW Analysis Modal Listeners ---
@@ -1751,17 +1891,29 @@
          * NEW: Loads and applies UI settings from localStorage
          */
         function loadUiSettings() {
-            const savedScale = localStorage.getItem('uiScale') || '100';
-            const savedSpacing = localStorage.getItem('uiSpacing') || '2';
+             // List of all settings [slider, storageKey, cssVar, defaultValue, unit]
+            const allSettings = [
+                [globalScaleSlider, 'uiScale', 'font-size', 100, '%'],
+                [layoutGapSlider, 'uiGap', '--main-gap', 5, 'rem'],
+                [verticalSpacingSlider, 'uiSpacing', '--timeline-v-spacing', 2, 'rem'],
+                [yearHeaderFsSlider, 'uiYearHeaderFs', '--timeline-year-fs', 2.25, 'rem'],
+                [monthCardFsSlider, 'uiMonthCardFs', '--timeline-card-fs', 1, 'rem'],
+                [sidebarTitleFsSlider, 'uiSidebarTitleFs', '--sidebar-title-fs', 1.875, 'rem'],
+                [sidebarBodyFsSlider, 'uiSidebarBodyFs', '--sidebar-body-fs', 1, 'rem'],
+                [modalTitleFsSlider, 'uiModalTitleFs', '--modal-title-fs', 1.875, 'rem'],
+                [modalBodyFsSlider, 'uiModalBodyFs', '--modal-body-fs', 1, 'rem']
+            ];
             
-            document.documentElement.style.fontSize = `${savedScale}%`;
-            document.documentElement.style.setProperty('--month-spacing', `${savedSpacing}rem`);
-            
-            // Set the sliders to the saved values
-            globalScaleSlider.value = savedScale;
-            globalScaleValue.textContent = `${savedScale}%`;
-            verticalSpacingSlider.value = savedSpacing;
-            verticalSpacingValue.textContent = `${savedSpacing}rem`;
+            allSettings.forEach(([slider, key, cssVar, defaultValue, unit]) => {
+                const savedValue = localStorage.getItem(key) || defaultValue;
+                const displayValue = `${savedValue}${unit}`;
+                
+                document.documentElement.style.setProperty(cssVar, displayValue);
+                slider.value = savedValue;
+                // Find the corresponding value display element
+                const valueDisplay = document.getElementById(slider.id.replace('Slider', 'Value'));
+                if (valueDisplay) valueDisplay.textContent = displayValue;
+            });
         }
         
         /**
