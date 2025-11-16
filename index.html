@@ -87,9 +87,14 @@
         .year-block {
             position: relative;
             padding: 2.5rem 0; 
+            /* This div is a positioning anchor, the span inside is sticky */
         }
         .year-block span {
              font-size: var(--timeline-year-fs);
+             /* NEW: Sticky Year Header */
+             position: sticky;
+             top: 180px; /* Default, will be overridden by JS */
+             z-index: 45; /* Below header (50) but above sidebar (40) */
         }
 
         /* Styling for each month's "dot" on the timeline */
@@ -367,7 +372,7 @@
             
             /* NEW: 200% Width + 50% Overlap */
             width: 200%;
-            transform: translateX(-40%);
+            transform: translateX(-50%);
             z-index: 40;
         }
         
@@ -393,23 +398,43 @@
             color: #374151; /* text-gray-700 */
         }
         
-        .figure-item .btn-delete-figure {
-            display: none;
+        /* DELETED btn-delete-figure styles (moved to modal) */
+        
+        /* NEW: Figure hover styles */
+        .figure-item .figure-description-tooltip {
             position: absolute;
-            top: -6px; /* Adjusted */
-            right: -6px; /* Adjusted */
-            width: 24px; 
-            height: 24px; 
-            line-height: 24px; 
-            text-align: center;
-            font-size: 12px; 
-            font-weight: bold;
-            border-radius: 50%;
-            cursor: pointer;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 0.75rem; /* mb-3 */
+            width: 12rem; /* w-48 */
+            padding: 0.75rem; /* p-3 */
+            background-color: #1f2937; /* bg-gray-900 */
+            color: white;
+            font-size: 0.875rem; /* text-sm */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease-in-out;
+            z-index: 50;
+            pointer-events: none; /* Allow hover on image */
         }
         
-        .figure-item:hover .btn-delete-figure {
-            display: block;
+        .figure-item .figure-description-tooltip::after { /* Tooltip arrow */
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 8px;
+            border-style: solid;
+            border-color: #1f2937 transparent transparent transparent;
+        }
+        
+        .figure-item.group:hover .figure-description-tooltip {
+            opacity: 1;
+            visibility: visible;
         }
         
         /* NEW: UI Modal styles */
@@ -929,6 +954,8 @@
                     <div>
                         <label for="analysisFigureImageUrl" class="block text-base font-medium text-gray-700 mb-1">Image URL</label>
                         <input type="text" id="analysisFigureImageUrl" class="w-full p-3 text-base border border-gray-300 rounded-md" placeholder="https://... image link" required>
+                        <!-- NEW: Image preview -->
+                        <img id="analysis-figure-preview" src="https://placehold.co/100x100?text=Preview" alt="preview" class="w-24 h-24 object-cover mt-2 rounded-md border">
                     </div>
                     <div class="col-span-1 md:col-span-2">
                         <label for="analysisFigureDescription" class="block text-base font-medium text-gray-700 mb-1">Description (for hover)</label>
@@ -1155,6 +1182,7 @@
         const analysisFigureName = document.getElementById('analysisFigureName');
         const analysisFigureImageUrl = document.getElementById('analysisFigureImageUrl');
         const analysisFigureDescription = document.getElementById('analysisFigureDescription');
+        const analysisFigurePreview = document.getElementById('analysis-figure-preview'); // NEW
  
         // --- INITIALIZATION ---
  
@@ -1183,7 +1211,7 @@
                 }
                 analysisYearSelect.innerHTML = yearOptions;
 
-                // Render the static timeline structure
+                // Render the static HTML structure
                 renderTimelineStructure();
 
                 // Set up authentication
@@ -1200,9 +1228,19 @@
         
         // NEW: Function to set sticky top
         function updateStickyTop() {
-            if (header && sidebarContent) {
+            if (header) { // sidebarContent is already checked
                 const headerHeight = header.offsetHeight;
-                sidebarContent.style.top = `${headerHeight + 20}px`;
+                const stickyTopValue = `${headerHeight + 20}px`;
+                
+                // 1. Update Sidebar
+                if (sidebarContent) {
+                    sidebarContent.style.top = stickyTopValue;
+                }
+                
+                // 2. NEW: Update all Year Headers
+                document.querySelectorAll('.year-block span').forEach(span => {
+                    span.style.top = stickyTopValue;
+                });
             }
         }
 
@@ -1795,12 +1833,16 @@
                 figuresForYear.forEach(fig => {
                     const figEl = document.createElement('div');
                     figEl.className = 'figure-item relative group';
-                    figEl.title = escapeHTML(fig.description); // Description on hover
+                    // figEl.title = escapeHTML(fig.description); // REMOVED: Replaced with custom tooltip
                     
                     figEl.innerHTML = `
                         <img src="${escapeHTML(fig.imageUrl)}" alt="${escapeHTML(fig.name)}" class="w-full h-24 object-cover rounded-md border" onerror="this.src='https://placehold.co/100x100?text=Image'">
                         <p class="text-sm text-center font-medium truncate mt-1">${escapeHTML(fig.name)}</p>
-                        <!-- DELETED the delete button from here -->
+                        <!-- NEW: Custom Hover Tooltip -->
+                        <div class="figure-description-tooltip">
+                            ${escapeHTML(fig.description)}
+                            <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-gray-900"></div>
+                        </div>
                     `;
                     keyFiguresContainer.appendChild(figEl);
                 });
@@ -2013,6 +2055,8 @@
             manageAnalysisBtn.addEventListener('click', () => {
                 updateAnalysisModal(analysisYearSelect.value); // Ensure it's up to date
                 analysisModal.showModal();
+                // NEW: Reset image preview on open
+                analysisFigurePreview.src = 'https://placehold.co/100x100?text=Preview';
             });
             analysisModalClose.addEventListener('click', () => analysisModal.close());
             analysisYearSelect.addEventListener('change', (e) => {
@@ -2022,6 +2066,11 @@
             analysisFigureForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 handleSaveFigure();
+            });
+            // NEW: Image preview listener
+            analysisFigureImageUrl.addEventListener('input', () => {
+                const url = analysisFigureImageUrl.value.trim();
+                analysisFigurePreview.src = url || 'https://placehold.co/100x100?text=Preview';
             });
             analysisFiguresList.addEventListener('click', (e) => {
                 if (e.target.classList.contains('btn-delete-figure-modal')) {
@@ -2386,6 +2435,7 @@
             try {
                 await addDoc(keyFiguresRef, dataToSave);
                 analysisFigureForm.reset(); // Reset the form in the modal
+                analysisFigurePreview.src = 'https://placehold.co/100x100?text=Preview'; // NEW: Reset preview
             } catch (error) {
                 console.error("Error saving figure:", error);
             }
