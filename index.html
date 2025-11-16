@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCS History Timeline (1947-1951)</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6; /* A very light, calming green-gray */
+        }
+
+        /* The main timeline vertical line */
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background-color: #cbd5e1; /* slate-300 */
+            z-index: 1;
+        }
+
+        /* Styling for each year block */
+        .year-block {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        /* Styling for each month's "dot" on the timeline */
+        .timeline-dot {
+            position: absolute;
+            top: 0.875rem; /* Aligns with the center of the month name */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border: 4px solid #059669; /* emerald-600 */
+            border-radius: 50%;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+        
+        .month-item:hover .timeline-dot {
+            transform: translateX(-50%) scale(1.1);
+            border-color: #047857; /* emerald-700 */
+        }
+
+        /* Positioning month items on the left and right */
+        .month-item {
+            position: relative;
+            width: 50%;
+            padding: 0 2.5rem; /* 40px */
+            margin-bottom: 1.5rem; /* 24px */
+        }
+
+        /* Even items on the right */
+        .month-item:nth-child(even) {
+            align-self: flex-end;
+            padding-left: 2.5rem;
+        }
+        
+        /* Odd items on the left */
+        .month-item:nth-child(odd) {
+            align-self: flex-start;
+            padding-right: 2.5rem;
+            text-align: right;
+        }
+
+        /* Adjust button alignment for left/right items */
+        .month-item:nth-child(odd) .month-buttons {
+            justify-content: flex-end;
+        }
+        
+        .month-item:nth-child(even) .month-buttons {
+            justify-content: flex-start;
+        }
+
+        /* The small horizontal line connecting dot to card */
+        .month-item::after {
+            content: '';
+            position: absolute;
+            top: 1.125rem; /* 18px */
+            width: 2.5rem; /* 40px */
+            height: 2px;
+            background: #cbd5e1; /* slate-300 */
+            z-index: 1;
+        }
+
+        .month-item:nth-child(even)::after {
+            left: 0;
+            transform: translateX(-100%);
+        }
+
+        .month-item:nth-child(odd)::after {
+            right: 0;
+            transform: translateX(100%);
+        }
+
+        /* Modal backdrop */
+        dialog::backdrop {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        /* Styles for compact view */
+        .compact-view .month-item {
+            display: none;
+        }
+        
+        .compact-view .month-item.has-data {
+            display: flex; /* This is the default for month-item */
+        }
+        
+        .compact-view .year-block.is-empty {
+            display: none;
+        }
+
+        /* Style for the duration span bars */
+        .duration-span {
+            position: absolute;
+            /* Left side of the main timeline line */
+            left: calc(50% - 2px); /* Main line is 4px, so -2px to be at its left edge */
+            transform: translateX(-100%); /* Start completely to the left of the center point */
+            width: 6px; /* Thinner line */
+            z-index: 1; /* Behind the dots (z-2) */
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        /* I-beam caps */
+        .duration-span::before,
+        .duration-span::after {
+            content: '';
+            position: absolute;
+            left: 50%; /* Center relative to the bar's 6px width */
+            transform: translateX(-50%); /* Horizontally center the cap */
+            width: 12px; /* Make it 12px wide (wider than the 6px bar) */
+            height: 6px; /* Thickness of the cap - As requested */
+            background-color: inherit; /* Inherit color from the bar */
+            z-index: 3; /* Above the dot (z-2) and main line (z-1) */
+        }
+        .duration-span::before { /* Start cap */
+            top: 0;
+            transform: translateX(-50%) translateY(-50%); /* Center on the start dot's position */
+        }
+        .duration-span::after { /* End cap */
+            bottom: 0;
+            transform: translateX(-50%) translateY(50%); /* Center on the end dot's position */
+        }
+
+        /* Color preview in modal */
+        #colorPreview {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1px solid #ccc;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+        
+        /* Styles for Political Context Bars */
+        #context-bar-container {
+            position: absolute;
+            top: 0;
+            left: 20px; /* Small gutter from the edge */
+            height: 100%;
+            z-index: 0; /* Behind everything */
+            width: calc(50% - 60px); /* Position on the far left, away from center line */
+            padding-top: 60px; /* Align with first year block */
+            display: none; /* Hidden by default */
+        }
+        
+        /* Show the container when the toggle is active */
+        .show-context #context-bar-container {
+            display: block;
+        }
+
+        .context-bar-lane {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 10px; /* Width of each role's bar */
+            z-index: 0; /* Behind everything */
+            background-color: rgba(200, 200, 200, 0.2);
+            border-radius: 5px;
+        }
+        
+        .context-bar-segment {
+            position: absolute;
+            width: 100%;
+            opacity: 0.6;
+            transition: opacity 0.3s ease;
+            border-radius: 2px;
+        }
+        
+        .context-bar-segment:hover {
+            opacity: 1.0;
+        }
+
+        .context-bar-legend {
+            position: absolute;
+            top: 0;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg) translateX(100%) translateY(5px);
+            transform-origin: bottom right;
+            font-size: 0.75rem; /* 12px */
+            font-weight: 600;
+            color: #555;
+            padding-bottom: 5px;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="antialiased text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-md p-6">
+        <div class="container mx-auto max-w-5xl">
+            <h1 class="text-3xl font-bold text-emerald-700">BCS History Timeline</h1>
+            <p class="text-lg text-gray-600">Focus: 1947 - 1951</p>
+            
+            <div class="flex items-center justify-between mt-4">
+                <div id="userInfo" class="text-xs text-gray-500 mt-2">Connecting...</div>
+                <div class="flex items-center space-x-4">
+                    <!-- New Manage Context Button -->
+                    <button id="manageContextBtn" class="px-3 py-1 bg-gray-600 text-white text-sm font-medium rounded-md hover:bg-gray-700 transition-colors">
+                        Manage Context
+                    </button>
+                    <!-- New Context Toggle -->
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm font-medium text-gray-700">Context</span>
+                        <label for="contextToggle" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="contextToggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gray-300 peer-checked:bg-gray-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                        </label>
+                    </div>
+                    <!-- Existing Compact Toggle -->
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm font-medium text-gray-700">Compact</span>
+                        <label for="compactToggle" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="compactToggle" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 peer-checked:bg-emerald-600 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto max-w-5xl py-12 px-4">
+        
+        <div id="timeline-container" class="relative timeline-container">
+            <!-- New container for political context bars -->
+            <div id="context-bar-container">
+                <!-- Context bars will be injected here by JS -->
+            </div>
+            <!-- Timeline will be generated by JS -->
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="text-center p-6 text-gray-500 text-sm">
+        A study tool crafted for your success.
+    </footer>
+
+    <!-- Info Modal Dialog -->
+    <dialog id="infoModal" class="p-0 rounded-lg shadow-xl w-full max-w-lg">
+        <form id="infoForm" class="p-6 space-y-4">
+            <div>
+                <h2 class="text-2xl font-semibold" id="modalTitle">Add Information</h2>
+                <p class="text-md text-gray-600" id="modalSubTitle">Year 1947, January</p>
+            </div>
+            
+            <!-- Hidden fields -->
+            <input type="hidden" id="modalYear">
+            <input type="hidden" id="modalMonth">
+            <input type="hidden" id="modalDocId">
+            
+            <div>
+                <label for="modalInfo" class="block text-sm font-medium text-gray-700 mb-1">Your Notes:</label>
+                <textarea id="modalInfo" rows="6" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none" placeholder="Enter historical events, key figures, or your personal notes here..."></textarea>
+            </div>
+
+            <!-- Duration Event Fields -->
+            <div class="p-4 bg-gray-50 rounded-md border border-gray-200 space-y-3">
+                <h3 class="font-medium text-gray-800">Event Duration</h3>
+                <div>
+                    <label for="modalEventType" class="block text-sm font-medium text-gray-700 mb-1">Type:</label>
+                    <select id="modalEventType" class="w-full p-2 border border-gray-300 rounded-md">
+                        <option value="single" selected>Single Month Event</option>
+                        <option value="start">Start of Event</option>
+                        <option value="end">End of Event</option>
+                    </select>
+                </div>
+                
+                <!-- Fields shown for start/end -->
+                <div id="modalDurationFields" class="hidden space-y-3">
+                    <div>
+                        <label for="modalEventTitle" class="block text-sm font-medium text-gray-700 mb-1">
+                            Event Title (must be identical for start and end)
+                        </label>
+                        <input type="text" id="modalEventTitle" class="w-full p-2 border border-gray-300 rounded-md" placeholder="e.g., Language Movement">
+                    </div>
+                    
+                    <!-- Color picker (only for 'start') -->
+                    <div id="modalEventColorWrapper">
+                        <label for="modalEventColor" class="inline-block text-sm font-medium text-gray-700 mb-1">Event Color:</label>
+                        <input type="color" id="modalEventColor" class="w-12 h-8 p-1 border border-gray-300 rounded-md align-middle" value="#3b82f6">
+                        <span id="colorPreview" style="background-color: #3b82f6;"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" id="modalCancel" class="px-5 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" id="modalSave" class="px-5 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors">
+                    Save
+                </button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- New Context Modal Dialog -->
+    <dialog id="contextModal" class="p-0 rounded-lg shadow-xl w-full max-w-2xl">
+        <div class="p-6">
+            <h2 class="text-2xl font-semibold">Manage Political Context</h2>
+            <p class="text-md text-gray-600">Add or remove governing eras. These will be shown as vertical bars on the timeline.</p>
+            
+            <!-- Form for adding new context -->
+            <form id="contextForm" class="mt-6 p-4 border border-gray-200 rounded-lg bg-gray-50 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h3 class="text-lg font-medium col-span-1 md:col-span-2">Add New Era</h3>
+                <div>
+                    <label for="contextRole" class="block text-sm font-medium text-gray-700 mb-1">Role / Title</label>
+                    <input type="text" id="contextRole" class="w-full p-2 border border-gray-300 rounded-md" placeholder="e.g., Governor-General" required>
+                </div>
+                <div>
+                    <label for="contextName" class="block text-sm font-medium text-gray-700 mb-1">Person / Party Name</label>
+                    <input type="text" id="contextName" class="w-full p-2 border border-gray-300 rounded-md" placeholder="e.g., Khawaja Nazimuddin" required>
+                </div>
+                <!-- Start Date -->
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label for="contextStartYear" class="block text-sm font-medium text-gray-700 mb-1">Start Year</label>
+                        <select id="contextStartYear" class="w-full p-2 border border-gray-300 rounded-md" required>
+                            <!-- Options will be populated by JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="contextStartMonth" class="block text-sm font-medium text-gray-700 mb-1">Start Month</label>
+                        <select id="contextStartMonth" class="w-full p-2 border border-gray-300 rounded-md" required>
+                            <!-- Options will be populated by JS -->
+                        </select>
+                    </div>
+                </div>
+                <!-- End Date -->
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label for="contextEndYear" class="block text-sm font-medium text-gray-700 mb-1">End Year</label>
+                        <select id="contextEndYear" class="w-full p-2 border border-gray-300 rounded-md" required>
+                            <!-- Options will be populated by JS -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="contextEndMonth" class="block text-sm font-medium text-gray-700 mb-1">End Month</label>
+                        <select id="contextEndMonth" class="w-full p-2 border border-gray-300 rounded-md" required>
+                            <!-- Options will be populated by JS -->
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label for="contextColor" class="block text-sm font-medium text-gray-700 mb-1">Bar Color</label>
+                    <input type="color" id="contextColor" class="w-full h-10 p-1 border border-gray-300 rounded-md" value="#eab308">
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full px-5 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                        Save Context Era
+                    </button>
+                </div>
+            </form>
+
+            <!-- List of existing contexts -->
+            <div class="mt-6">
+                <h3 class="text-lg font-medium">Existing Eras</h3>
+                <div id="contextList" class="mt-2 space-y-2 max-h-60 overflow-y-auto p-2 border rounded-md">
+                    <p class="text-gray-500 italic">No context eras added yet.</p>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <button type="button" id="contextModalClose" class="px-5 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- Firebase and App Logic -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            addDoc, 
+            setDoc, 
+            updateDoc, 
+            deleteDoc, 
+            onSnapshot, 
+            collection,
+            query,
+            setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- GLOBAL VARIABLES ---
+        // These are provided by the environment
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Firebase services
+        let app, auth, db;
+        
+        // App state
+        let userId = null;
+        let isAuthReady = false;
+        let timelineEventsRef = null;
+        let unsubscribeTimeline = null; // To store the onSnapshot listener
+
+        // New context state
+        let contextEventsRef = null;
+        let unsubscribeContext = null;
+        let allContextData = [];
+
+        // DOM Elements
+        const timelineContainer = document.getElementById('timeline-container');
+        const userInfo = document.getElementById('userInfo');
+        const modal = document.getElementById('infoModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalSubTitle = document.getElementById('modalSubTitle');
+        const modalForm = document.getElementById('infoForm');
+        const modalYear = document.getElementById('modalYear');
+        const modalMonth = document.getElementById('modalMonth');
+        const modalDocId = document.getElementById('modalDocId');
+        const modalInfo = document.getElementById('modalInfo');
+        const modalCancel = document.getElementById('modalCancel');
+        
+        // Duration Modal Fields
+        const modalEventType = document.getElementById('modalEventType');
+        const modalDurationFields = document.getElementById('modalDurationFields');
+        const modalEventTitle = document.getElementById('modalEventTitle');
+        const modalEventColorWrapper = document.getElementById('modalEventColorWrapper');
+        const modalEventColor = document.getElementById('modalEventColor');
+        const colorPreview = document.getElementById('colorPreview');
+
+        // New Context Modal DOM Elements
+        const manageContextBtn = document.getElementById('manageContextBtn');
+        const contextToggle = document.getElementById('contextToggle');
+        const contextBarContainer = document.getElementById('context-bar-container');
+        const contextModal = document.getElementById('contextModal');
+        const contextForm = document.getElementById('contextForm');
+        const contextModalClose = document.getElementById('contextModalClose');
+        const contextList = document.getElementById('contextList');
+        const contextRole = document.getElementById('contextRole');
+        const contextName = document.getElementById('contextName');
+        const contextStartYear = document.getElementById('contextStartYear');
+        const contextStartMonth = document.getElementById('contextStartMonth');
+        const contextEndYear = document.getElementById('contextEndYear');
+        const contextEndMonth = document.getElementById('contextEndMonth');
+        const contextColor = document.getElementById('contextColor');
+
+
+        // --- INITIALIZATION ---
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                // Initialize Firebase
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                setLogLevel('Debug'); // Enable detailed logs
+
+                // Render the static timeline structure
+                renderTimelineStructure();
+
+                // Set up authentication
+                setupAuth();
+                
+                // Set up global event listeners
+                setupEventListeners();
+                
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+                userInfo.textContent = "Error: Could not connect to services.";
+            }
+        });
+
+        /**
+         * Sets up Firebase authentication and listens for state changes.
+         */
+        async function setupAuth() {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    userId = user.uid;
+                    isAuthReady = true;
+                    userInfo.textContent = `Your Study ID: ${userId} (All notes are saved privately)`;
+                    
+                    // Define the user's private collection for timeline events
+                    timelineEventsRef = collection(db, 'artifacts', appId, 'users', userId, 'timeline_events');
+                    
+                    // Define the user's private collection for context
+                    contextEventsRef = collection(db, 'artifacts', appId, 'users', userId, 'political_context');
+
+                    // Pre-populate initial data if not already done
+                    await addInitialData();
+
+                    // Start listening for real-time data
+                    listenForTimelineData();
+                    listenForContextData(); // <-- ADD THIS
+
+                } else {
+                    isAuthReady = false;
+                    userId = null;
+                    userInfo.textContent = "Authentication failed. Please refresh.";
+                }
+            });
+
+            try {
+                // Sign in
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Authentication error:", error);
+                userInfo.textContent = "Authentication error.";
+            }
+        }
+        
+        /**
+         * Checks if initial data exists and adds it if not.
+         * This ensures the user sees an example entry on first load.
+         */
+        async function addInitialData() {
+            if (!timelineEventsRef) return;
+            
+            // Use a specific doc ID as a flag
+            const flagDocRef = doc(timelineEventsRef, 'init_flag');
+            
+            try {
+                const flagDoc = await getDoc(flagDocRef);
+                if (!flagDoc.exists()) {
+                    // Flag doesn't exist, so add the initial data
+                    await addDoc(timelineEventsRef, {
+                        year: 1947,
+                        month: "August",
+                        info: "Partition of British India. East Bengal (future Bangladesh) becomes the eastern wing of the newly formed Dominion of Pakistan.",
+                        eventType: "single"
+                    });
+                    
+                    // Set the flag
+                    await setDoc(flagDocRef, { initialized: true });
+                }
+            } catch (error) {
+                console.error("Error checking/adding initial data:", error);
+            }
+        }
+
+        /**
+         * Renders the static HTML structure of the timeline (years, months).
+         * Data will be populated separately.
+         */
+        function renderTimelineStructure() {
+            timelineContainer.innerHTML = ''; // Clear existing
+            
+            // Add the context bar container first
+            timelineContainer.innerHTML = '<div id="context-bar-container"></div>';
+
+            const startYear = 1947;
+            const endYear = 1951;
+            const months = [
+                "January", "February", "March", "April", "May", "June", 
+                "July", "August", "September", "October", "November", "December"
+            ];
+
+            for (let year = startYear; year <= endYear; year++) {
+                // Create year header
+                const yearHeader = document.createElement('div');
+                yearHeader.className = 'year-block text-center';
+                yearHeader.innerHTML = `
+                    <span class="relative z-10 inline-block px-6 py-2 bg-emerald-700 text-white font-bold text-2xl rounded-lg shadow-lg">
+                        ${year}
+                    </span>
+                `;
+                timelineContainer.appendChild(yearHeader);
+
+                // Create month items for the year
+                months.forEach(month => {
+                    const monthItem = document.createElement('div');
+                    monthItem.className = 'month-item flex flex-col';
+                    // Unique ID for easy targeting
+                    monthItem.id = `month-item-${year}-${month}`; 
+                    // Data attributes for event listeners
+                    monthItem.dataset.year = year;
+                    monthItem.dataset.month = month;
+                    
+                    monthItem.innerHTML = `
+                        <div class="timeline-dot"></div>
+                        <div class="month-card z-10 bg-white p-4 rounded-lg shadow-md border border-gray-200">
+                            <h3 class="font-semibold text-lg text-emerald-600">${month}</h3>
+                            
+                            <!-- Dynamic content area -->
+                            <div class="month-content mt-2" id="content-${year}-${month}">
+                                <p class="text-gray-500 italic text-sm">No notes added yet.</p>
+                            </div>
+                            
+                            <!-- Dynamic button area -->
+                            <div class="month-buttons mt-3 flex" id="buttons-${year}-${month}">
+                                <button class="btn-add px-3 py-1 bg-emerald-100 text-emerald-700 text-sm font-medium rounded-md hover:bg-emerald-200 transition-colors"
+                                        data-year="${year}" data-month="${month}">
+                                    Add Info
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    timelineContainer.appendChild(monthItem);
+                });
+            }
+            
+            // Re-select the context bar container as it was overwritten
+            const contextBarContainer = document.getElementById('context-bar-container');
+
+            // Populate the new context modal dropdowns
+            populateContextDateDropdowns(startYear, endYear, months);
+        }
+
+        /**
+         * Populates the date dropdowns in the context modal.
+         */
+        function populateContextDateDropdowns(startYear, endYear, months) {
+            const yearOptions = [];
+            for (let y = startYear; y <= endYear; y++) {
+                yearOptions.push(`<option value="${y}">${y}</option>`);
+            }
+            const monthOptions = months.map(m => `<option value="${m}">${m}</option>`);
+            
+            const yearOptionsHtml = yearOptions.join('');
+            const monthOptionsHtml = monthOptions.join('');
+            
+            contextStartYear.innerHTML = yearOptionsHtml;
+            contextEndYear.innerHTML = yearOptionsHtml;
+            contextStartMonth.innerHTML = monthOptionsHtml;
+            contextEndMonth.innerHTML = monthOptionsHtml;
+            
+            // Set defaults
+            contextStartYear.value = startYear;
+            contextStartMonth.value = "January";
+            contextEndYear.value = endYear;
+            contextEndMonth.value = "December";
+        }
+
+        /**
+         * Listens for real-time data from Firestore and updates the UI.
+         */
+        function listenForTimelineData() {
+            if (!isAuthReady || !timelineEventsRef) {
+                console.log("Auth not ready or collection ref not set.");
+                return;
+            }
+            
+            // Unsubscribe from any previous listener
+            if (unsubscribeTimeline) {
+                unsubscribeTimeline();
+            }
+
+            const q = query(timelineEventsRef);
+            
+            unsubscribeTimeline = onSnapshot(q, (snapshot) => {
+                // First, reset all dynamic content to the default state
+                resetAllMonthItems();
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    
+                    // Skip the flag document
+                    if (id === 'init_flag') return;
+
+                    const { year, month, info } = data;
+                    
+                    // Find the corresponding UI elements
+                    const contentEl = document.getElementById(`content-${year}-${month}`);
+                    const buttonsEl = document.getElementById(`buttons-${year}-${month}`);
+                    const monthItemEl = document.getElementById(`month-item-${year}-${month}`);
+                    
+                    if (contentEl && buttonsEl && monthItemEl) {
+                        // Store the doc ID on the month-item for context
+                        monthItemEl.dataset.id = id;
+                        monthItemEl.classList.add('has-data'); // Mark as having data
+                        
+                        // Update content
+                        contentEl.innerHTML = `
+                            <p class="text-gray-800 p-3 bg-emerald-50 rounded-md whitespace-pre-wrap">${escapeHTML(info)}</p>
+                        `;
+                        
+                        // Add duration info if it exists
+                        if (data.eventType === 'start' || data.eventType === 'end') {
+                            contentEl.innerHTML += `
+                                <span class="mt-2 inline-block text-xs font-medium px-2 py-0.5 rounded
+                                    ${data.eventType === 'start' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800'}">
+                                    ${data.eventType === 'start' ? 'Start' : 'End'}: ${escapeHTML(data.eventTitle)}
+                                </span>
+                            `;
+                        }
+
+                        // Update buttons
+                        buttonsEl.innerHTML = `
+                            <button class="btn-edit px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-md hover:bg-blue-200 transition-colors"
+                                    data-year="${year}" data-month="${month}" data-id="${id}">
+                                Edit
+                            </button>
+                            <button class="btn-delete ml-2 px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-md hover:bg-red-200 transition-colors"
+                                    data-id="${id}">
+                                Delete
+                            </button>
+                        `;
+                    }
+                });
+                
+                // After cards are rendered, draw the duration spans
+                renderDurationSpans(snapshot);
+
+                // After loop, update year visibility based on toggle
+                updateYearBlockVisibility(document.getElementById('compactToggle').checked);
+
+                // Re-render context bars, as month positions might have changed
+                renderContextBars();
+
+            }, (error) => {
+                console.error("Error with onSnapshot:", error);
+            });
+        }
+
+        /**
+         * Draws the visual span bars on the timeline for duration events.
+         */
+        function renderDurationSpans(snapshot) {
+            // Clear any existing span bars
+            document.querySelectorAll('.duration-span').forEach(el => el.remove());
+
+            const spansMap = new Map();
+
+            // First pass: collect all start and end points
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const { eventType, eventTitle, eventColor, year, month } = data;
+
+                if (!eventTitle || (eventType !== 'start' && eventType !== 'end')) {
+                    return; // Not a duration event part
+                }
+                
+                // Find the month-item element to get its offsetTop relative to the container
+                const monthItemEl = document.getElementById(`month-item-${year}-${month}`);
+                if (!monthItemEl) return;
+                
+                // Find the dot element inside it to get its offsetTop relative to the month-item
+                const dotEl = monthItemEl.querySelector('.timeline-dot');
+                if (!dotEl) return;
+
+                // The true top is the month-item's offset + the dot's offset inside it
+                const top = monthItemEl.offsetTop + dotEl.offsetTop;
+
+                if (!spansMap.has(eventTitle)) {
+                    spansMap.set(eventTitle, {});
+                }
+
+                if (eventType === 'start') {
+                    spansMap.get(eventTitle).startTop = top;
+                    spansMap.get(eventTitle).color = eventColor || '#cbd5e1'; // default color
+                    spansMap.get(eventTitle).title = eventTitle;
+                } else if (eventType === 'end') {
+                    spansMap.get(eventTitle).endTop = top;
+                }
+            });
+
+            // --- NEW LANE-CALCULATION LOGIC ---
+
+            // Convert map values to an array of valid spans, sorted by start time
+            const allSpans = Array.from(spansMap.values())
+                .filter(s => s.startTop !== undefined && s.endTop !== undefined && s.endTop > s.startTop)
+                .sort((a, b) => a.startTop - b.startTop);
+
+            const activeLanes = []; // Stores the endTop of the last event in each lane
+
+            for (const span of allSpans) {
+                let foundLane = false;
+                // Find an available lane
+                for (let i = 0; i < activeLanes.length; i++) {
+                    if (span.startTop >= activeLanes[i]) {
+                        // This lane is free (event starts after the last one in this lane ended)
+                        activeLanes[i] = span.endTop; // This lane is now occupied until this span ends
+                        span.lane = i; // Assign lane index
+                        foundLane = true;
+                        break;
+                    }
+                }
+
+                if (!foundLane) {
+                    // No free lanes, create a new one
+                    span.lane = activeLanes.length;
+                    activeLanes.push(span.endTop); // Add new lane with this span's end time
+                }
+            }
+
+            const barWidthPx = 6; // Thinner bars
+            const barGapPx = 2; // Small gap between bars
+            const initialOffsetFromMainLinePx = 4; // Start slightly to the left of the main line
+
+
+            // Second pass: draw the bars with new transform
+            for (const span of allSpans) {
+                // Calculate total width of all bars and gaps up to this lane
+                const totalOffsetForThisLane = initialOffsetFromMainLinePx + (span.lane * (barWidthPx + barGapPx));
+                
+                const height = span.endTop - span.startTop;
+
+                const spanBar = document.createElement('div');
+                spanBar.className = 'duration-span';
+                spanBar.style.backgroundColor = span.color;
+                spanBar.style.top = `${span.startTop}px`;
+                spanBar.style.height = `${height}px`;
+                spanBar.style.width = `${barWidthPx}px`; // Set explicit width
+                // New transform logic: shift to the left, then apply the lane offset
+                spanBar.style.transform = `translateX(calc(-100% - ${totalOffsetForThisLane}px))`;
+                spanBar.title = span.title; // Show title on hover
+                timelineContainer.appendChild(spanBar);
+            }
+        }
+        
+        /**
+         * Listens for real-time context data from Firestore.
+         */
+        function listenForContextData() {
+            if (!isAuthReady || !contextEventsRef) {
+                console.log("Auth not ready or context collection ref not set.");
+                return;
+            }
+            
+            if (unsubscribeContext) unsubscribeContext();
+
+            const q = query(contextEventsRef); // We can sort later if needed
+            
+            unsubscribeContext = onSnapshot(q, (snapshot) => {
+                allContextData = [];
+                snapshot.forEach(doc => {
+                    allContextData.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Sort by start date (most important)
+                const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                allContextData.sort((a, b) => {
+                    if (a.startYear !== b.startYear) return a.startYear - b.startYear;
+                    return months.indexOf(a.startMonth) - months.indexOf(b.startMonth);
+                });
+
+                // Update the UI
+                renderContextListInModal();
+                renderContextBars();
+            }, (error) => {
+                console.error("Error with context onSnapshot:", error);
+            });
+        }
+
+        /**
+         * Renders the vertical context bars on the timeline.
+         */
+        function renderContextBars() {
+            const contextBarContainer = document.getElementById('context-bar-container');
+            if (!contextBarContainer) return; // Guard clause
+            contextBarContainer.innerHTML = ''; // Clear existing
+            
+            // Group by role
+            const rolesMap = new Map();
+            allContextData.forEach(item => {
+                if (!rolesMap.has(item.role)) {
+                    rolesMap.set(item.role, []);
+                }
+                rolesMap.get(item.role).push(item);
+            });
+
+            const laneWidth = 10;
+            const laneGap = 16;
+            let laneIndex = 0;
+
+            rolesMap.forEach((segments, role) => {
+                const laneOffset = laneIndex * (laneWidth + laneGap);
+                
+                // Create the lane container
+                const laneEl = document.createElement('div');
+                laneEl.className = 'context-bar-lane';
+                laneEl.style.left = `${laneOffset}px`;
+                
+                // Add legend/title for the lane
+                const legendEl = document.createElement('div');
+                legendEl.className = 'context-bar-legend';
+                legendEl.textContent = role;
+                laneEl.appendChild(legendEl);
+
+                // Draw segments in this lane
+                segments.forEach(segment => {
+                    const startEl = document.getElementById(`month-item-${segment.startYear}-${segment.startMonth}`);
+                    const endEl = document.getElementById(`month-item-${segment.endYear}-${segment.endMonth}`);
+                    
+                    if (!startEl || !endEl) {
+                        console.warn("Could not find start/end element for context:", segment);
+                        return;
+                    }
+
+                    const startDot = startEl.querySelector('.timeline-dot');
+                    const endDot = endEl.querySelector('.timeline-dot');
+                    
+                    if (!startDot || !endDot) return;
+
+                    const startTop = startEl.offsetTop + startDot.offsetTop;
+                    const endTop = endEl.offsetTop + endDot.offsetTop;
+                    const height = endTop - startTop;
+
+                    if (height < 0) return; // Invalid range
+
+                    const segmentEl = document.createElement('div');
+                    segmentEl.className = 'context-bar-segment';
+                    segmentEl.style.backgroundColor = segment.color;
+                    segmentEl.style.top = `${startTop}px`;
+                    segmentEl.style.height = `${height}px`;
+                    segmentEl.title = `${role}: ${segment.name} (${segment.startMonth} ${segment.startYear} - ${segment.endMonth} ${segment.endYear})`;
+                    
+                    laneEl.appendChild(segmentEl);
+                });
+                
+                contextBarContainer.appendChild(laneEl);
+                laneIndex++;
+            });
+        }
+
+        /**
+         * Renders the list of context items in the management modal.
+         */
+        function renderContextListInModal() {
+            if (allContextData.length === 0) {
+                contextList.innerHTML = `<p class="text-gray-500 italic">No context eras added yet.</p>`;
+                return;
+            }
+
+            contextList.innerHTML = allContextData.map(item => `
+                <div class="flex items-center justify-between p-2 bg-white border rounded-md">
+                    <div class="flex-1">
+                        <span class="font-medium" style="color: ${item.color};">■ ${escapeHTML(item.role)}:</span>
+                        <span class="text-gray-700">${escapeHTML(item.name)}</span>
+                        <span class="text-xs text-gray-500 block">
+                            (${item.startMonth} ${item.startYear} - ${item.endMonth} ${item.endYear})
+                        </span>
+                    </div>
+                    <button class="btn-delete-context ml-4 px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded-md hover:bg-red-200 transition-colors"
+                            data-id="${item.id}">
+                        Delete
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        /**
+         * Resets all month items to their default "empty" state.
+         * This prevents visual bugs when data is deleted.
+         */
+        function resetAllMonthItems() {
+            document.querySelectorAll('.month-item').forEach(item => {
+                const { year, month } = item.dataset;
+                if (!year || !month) return;
+                
+                const contentEl = document.getElementById(`content-${year}-${month}`);
+                const buttonsEl = document.getElementById(`buttons-${year}-${month}`);
+                
+                if (contentEl) {
+                    contentEl.innerHTML = `<p class="text-gray-500 italic text-sm">No notes added yet.</p>`;
+                }
+                if (buttonsEl) {
+                    buttonsEl.innerHTML = `
+                        <button class="btn-add px-3 py-1 bg-emerald-100 text-emerald-700 text-sm font-medium rounded-md hover:bg-emerald-200 transition-colors"
+                                data-year="${year}" data-month="${month}">
+                            Add Info
+                        </button>
+                    `;
+                }
+                // Clear the stored doc ID and data flag
+                delete item.dataset.id;
+                item.classList.remove('has-data');
+            });
+        }
+        
+        /**
+         * Sets up global event listeners for buttons and modal.
+         */
+        function setupEventListeners() {
+            // Use event delegation for timeline buttons
+            timelineContainer.addEventListener('click', (e) => {
+                const target = e.target;
+                
+                if (target.classList.contains('btn-add')) {
+                    const { year, month } = target.dataset;
+                    openModalForAdd(year, month);
+                } 
+                else if (target.classList.contains('btn-edit')) {
+                    const { year, month, id } = target.dataset;
+                    openModalForEdit(year, month, id);
+                }
+                else if (target.classList.contains('btn-delete')) {
+                    const { id } = target.dataset;
+                    handleDelete(id);
+                }
+            });
+            
+            // Modal form submission
+            modalForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                handleSave();
+            });
+            
+            // Modal cancel button
+            modalCancel.addEventListener('click', () => {
+                modal.close();
+            });
+
+            // Modal duration fields logic
+            modalEventType.addEventListener('change', () => {
+                const type = modalEventType.value;
+                if (type === 'start') {
+                    modalDurationFields.classList.remove('hidden');
+                    modalEventColorWrapper.classList.remove('hidden');
+                    colorPreview.style.display = 'inline-block'; // Show color preview
+                } else if (type === 'end') {
+                    modalDurationFields.classList.remove('hidden');
+                    modalEventColorWrapper.classList.add('hidden'); // Hide color picker for end
+                    colorPreview.style.display = 'none'; // Hide color preview for end
+                } else {
+                    modalDurationFields.classList.add('hidden');
+                    colorPreview.style.display = 'none'; // Hide color preview for single
+                }
+            });
+
+            // Update color preview when color input changes
+            modalEventColor.addEventListener('input', () => {
+                colorPreview.style.backgroundColor = modalEventColor.value;
+            });
+
+
+            // Compact View Toggle
+            const compactToggle = document.getElementById('compactToggle');
+            compactToggle.addEventListener('change', () => {
+                timelineContainer.classList.toggle('compact-view', compactToggle.checked);
+                updateYearBlockVisibility(compactToggle.checked);
+                renderContextBars(); // Re-render bars on compact toggle
+            });
+
+            // Context Toggle
+            contextToggle.addEventListener('change', () => {
+                timelineContainer.classList.toggle('show-context', contextToggle.checked);
+            });
+
+            // Manage Context Button
+            manageContextBtn.addEventListener('click', () => {
+                contextModal.showModal();
+                // List is already rendered by onSnapshot
+            });
+            
+            // Context Modal Close Button
+            contextModalClose.addEventListener('click', () => {
+                contextModal.close();
+            });
+            
+            // Context Form Submission
+            contextForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                handleSaveContext();
+            });
+
+            // Context List (for deleting)
+            contextList.addEventListener('click', (e) => {
+                if (e.target.classList.contains('btn-delete-context')) {
+                    const id = e.target.dataset.id;
+                    handleDeleteContext(id);
+                }
+            });
+        }
+        
+        /**
+         * Opens the modal to add a new note.
+         */
+        function openModalForAdd(year, month) {
+            modalTitle.textContent = "Add Information";
+            modalSubTitle.textContent = `Year ${year}, ${month}`;
+            modalYear.value = year;
+            modalMonth.value = month;
+            modalDocId.value = ""; // No doc ID yet
+            
+            // Reset fields
+            modalInfo.value = "";
+            modalEventType.value = "single";
+            modalEventTitle.value = "";
+            modalEventColor.value = "#3b82f6";
+            colorPreview.style.backgroundColor = "#3b82f6";
+            modalDurationFields.classList.add('hidden');
+            colorPreview.style.display = 'none'; // Hide color preview by default
+
+            modal.showModal();
+        }
+        
+        /**
+         * Opens the modal to edit an existing note.
+         */
+        async function openModalForEdit(year, month, docId) {
+            if (!docId || !timelineEventsRef) return;
+            
+            const docRef = doc(timelineEventsRef, docId);
+            try {
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    
+                    modalTitle.textContent = "Edit Information";
+                    modalSubTitle.textContent = `Year ${year}, ${month}`;
+                    modalYear.value = year;
+                    modalMonth.value = month;
+                    modalDocId.value = docId;
+                    
+                    // Populate fields from doc
+                    modalInfo.value = data.info || "";
+                    modalEventType.value = data.eventType || "single";
+                    modalEventTitle.value = data.eventTitle || "";
+                    modalEventColor.value = data.eventColor || "#3b82f6";
+                    
+                    // Show/hide duration fields based on saved type
+                    const type = modalEventType.value;
+                    if (type === 'start') {
+                        modalDurationFields.classList.remove('hidden');
+                        modalEventColorWrapper.classList.remove('hidden');
+                        colorPreview.style.backgroundColor = modalEventColor.value;
+                        colorPreview.style.display = 'inline-block';
+                    } else if (type === 'end') {
+                        modalDurationFields.classList.remove('hidden');
+                        modalEventColorWrapper.classList.add('hidden'); // Hide color picker for end
+                        colorPreview.style.display = 'none';
+                    } else {
+                        modalDurationFields.classList.add('hidden');
+                        colorPreview.style.display = 'none';
+                    }
+
+                    modal.showModal();
+                } else {
+                    console.error("No such document to edit!");
+                }
+            } catch (error) {
+                console.error("Error fetching document for edit:", error);
+            }
+        }
+
+        /**
+         * Handles saving a new context era.
+         */
+        async function handleSaveContext() {
+            if (!contextEventsRef) return;
+
+            const dataToSave = {
+                role: contextRole.value.trim(),
+                name: contextName.value.trim(),
+                startYear: parseInt(contextStartYear.value),
+                startMonth: contextStartMonth.value,
+                endYear: parseInt(contextEndYear.value),
+                endMonth: contextEndMonth.value,
+                color: contextColor.value
+            };
+
+            // Simple validation
+            if (!dataToSave.role || !dataToSave.name) {
+                console.error("Role and Name are required.");
+                // You could show a UI error here
+                return;
+            }
+            
+            // More advanced date validation
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const startMonthIndex = months.indexOf(dataToSave.startMonth);
+            const endMonthIndex = months.indexOf(dataToSave.endMonth);
+
+            if (dataToSave.startYear > dataToSave.endYear || (dataToSave.startYear === dataToSave.endYear && startMonthIndex > endMonthIndex)) {
+                console.error("Start date must be before end date.");
+                // You could show a UI error in the modal
+                return;
+            }
+            
+            try {
+                await addDoc(contextEventsRef, dataToSave);
+                // Clear the form for the next entry
+                contextForm.reset();
+                // Set defaults again
+                const startYear = 1947;
+                const endYear = 1951;
+                populateContextDateDropdowns(startYear, endYear, months);
+            } catch (error) {
+                console.error("Error saving context:", error);
+            }
+        }
+
+        /**
+         * Handles deleting a context era.
+         */
+        async function handleDeleteContext(docId) {
+            if (!docId || !contextEventsRef) return;
+            
+            const docRef = doc(contextEventsRef, docId);
+            try {
+                await deleteDoc(docRef);
+                // onSnapshot will handle the UI update
+            } catch (error) {
+                console.error("Error deleting context:", error);
+            }
+        }
+
+
+        /**
+         * Handles saving data (either new or updated).
+         */
+        async function handleSave() {
+            if (!timelineEventsRef) return;
+
+            const year = modalYear.value;
+            const month = modalMonth.value;
+            const docId = modalDocId.value;
+            const info = modalInfo.value.trim();
+            const eventType = modalEventType.value;
+            const eventTitle = modalEventTitle.value.trim();
+            const eventColor = modalEventColor.value;
+
+            if (!info) {
+                // Don't save empty notes. Maybe show a small error.
+                modalInfo.classList.add('border-red-500');
+                setTimeout(() => modalInfo.classList.remove('border-red-500'), 2000);
+                return;
+            }
+
+            // Prep data to save
+            const dataToSave = {
+                year: parseInt(year),
+                month: month,
+                info: info,
+                eventType: eventType
+            };
+
+            if (eventType === 'start') {
+                if (!eventTitle) {
+                    modalEventTitle.classList.add('border-red-500');
+                    setTimeout(() => modalEventTitle.classList.remove('border-red-500'), 2000);
+                    return; // Title is required
+                }
+                dataToSave.eventTitle = eventTitle;
+                dataToSave.eventColor = eventColor;
+            } else if (eventType === 'end') {
+                if (!eventTitle) {
+                    modalEventTitle.classList.add('border-red-500');
+                    setTimeout(() => modalEventTitle.classList.remove('border-red-500'), 2000);
+                    return; // Title is required
+                }
+                dataToSave.eventTitle = eventTitle;
+                // We don't need to save color for the 'end' event
+            }
+            // For 'single', no extra data is needed
+
+            try {
+                if (docId) {
+                    // This is an update
+                    const docRef = doc(timelineEventsRef, docId);
+                    await updateDoc(docRef, dataToSave);
+                } else {
+                    // This is a new entry
+                    await addDoc(timelineEventsRef, dataToSave);
+                }
+                modal.close();
+            } catch (error) {
+                console.error("Error saving document:", error);
+            }
+        }
+        
+        /**
+         * Handles deleting a note.
+         */
+        async function handleDelete(docId) {
+            if (!docId || !timelineEventsRef) return;
+            
+            // We can add a custom confirmation dialog here later if needed
+            // For now, delete directly
+            
+            const docRef = doc(timelineEventsRef, docId);
+            try {
+                await deleteDoc(docRef);
+                // onSnapshot will handle the UI update
+            } catch (error)
+ {
+                console.error("Error deleting document:", error);
+            }
+        }
+        
+        /**
+         * Hides or shows year blocks based on whether they have populated months.
+         * Only runs when compact view is enabled.
+         */
+        function updateYearBlockVisibility(isCompactView) {
+            const yearBlocks = document.querySelectorAll('.year-block');
+            
+            yearBlocks.forEach(yearBlock => {
+                if (isCompactView) {
+                    let hasData = false;
+                    let nextElement = yearBlock.nextElementSibling;
+                    
+                    // Check subsequent month-items until we hit the next year-block
+                    while (nextElement && !nextElement.classList.contains('year-block')) {
+                        if (nextElement.classList.contains('month-item') && nextElement.classList.contains('has-data')) {
+                            hasData = true;
+                            break; // Found a populated month, no need to check further
+                        }
+                        nextElement = nextElement.nextElementSibling;
+                    }
+                    
+                    // If no data, hide the year block
+                    yearBlock.classList.toggle('is-empty', !hasData);
+                } else {
+                    // If not compact view, always show the year block
+                    yearBlock.classList.remove('is-empty');
+                }
+            });
+        }
+
+        /**
+         * Utility to escape HTML for safe rendering.
+         */
+        function escapeHTML(str) {
+            return str.replace(/[&<>"']/g, function(m) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                }[m];
+            });
+        }
+        
+    </script>
+</body>
+</html>
