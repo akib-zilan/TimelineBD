@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BCS History Timeline (1947-1951)</title>
+    <!-- MODIFIED: Title is more general now -->
+    <title>BCS History Timeline</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Load Inter font -->
@@ -205,6 +206,9 @@
         #figureModal form { padding: var(--modal-padding-y) var(--modal-padding-x); }
         #uiModal > div { padding: var(--modal-padding-y) var(--modal-padding-x); }
         #analysisModal > div { padding: var(--modal-padding-y) var(--modal-padding-x); }
+        /* NEW: Added padding rule for new modal */
+        #timelineRangeModal form { padding: var(--modal-padding-y) var(--modal-padding-x); }
+
 
         /* Styles for compact view */
         .compact-view .month-item {
@@ -452,11 +456,16 @@
             <!-- Increased max-width to max-w-screen-2xl -->
             <div class="container mx-auto max-w-screen-2xl">
                 <h1 class="text-4xl font-bold text-emerald-700">BCS History Timeline</h1> <!-- Increased size -->
-                <p class="text-xl text-gray-600">Focus: 1947 - 1951</p> <!-- Increased size -->
+                <!-- MODIFIED: Added ID to this p tag -->
+                <p id="headerFocus" class="text-xl text-gray-600">Focus: 1947 - 1951</p> <!-- Increased size -->
                 
                 <div class="flex items-center justify-between mt-4">
                     <div id="userInfo" class="text-sm text-gray-500 mt-2">Connecting...</div> <!-- Increased size -->
                     <div class="flex items-center space-x-4">
+                        <!-- NEW: Create Timeline Button -->
+                        <button id="createTimelineBtn" class="px-4 py-2 bg-green-600 text-white text-base font-medium rounded-md hover:bg-green-700 transition-colors">
+                            Create Timeline
+                        </button>
                         <!-- Manage UI Button -->
                         <button id="manageUiBtn" class="px-4 py-2 bg-blue-600 text-white text-base font-medium rounded-md hover:bg-blue-700 transition-colors"> <!-- Increased size -->
                             Manage UI
@@ -545,6 +554,37 @@
             A study tool crafted for your success.
         </footer>
     </div> <!-- End .main-app-content -->
+
+
+    <!-- NEW: Timeline Range Modal Dialog -->
+    <dialog id="timelineRangeModal" class="p-0 rounded-lg shadow-xl w-full max-w-md">
+        <form id="timelineRangeForm" class="space-y-6">
+            <div>
+                <h2 class="text-3xl font-semibold">Create Timeline</h2>
+                <p class="text-lg text-gray-600">Set the start and end year for your timeline.</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="startYearInput" class="block text-base font-medium text-gray-700 mb-1">Start Year</label>
+                    <input type="number" id="startYearInput" class="w-full p-3 text-base border border-gray-300 rounded-md" placeholder="e.g., 1947" required>
+                </div>
+                <div>
+                    <label for="endYearInput" class="block text-base font-medium text-gray-700 mb-1">End Year</label>
+                    <input type="number" id="endYearInput" class="w-full p-3 text-base border border-gray-300 rounded-md" placeholder="e.g., 1951" required>
+                </div>
+            </div>
+            
+            <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" id="timelineRangeCancel" class="px-6 py-3 text-base bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors">
+                    Cancel
+                </button>
+                <button type="submit" class="px-6 py-3 text-base bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+                    Apply
+                </button>
+            </div>
+        </form>
+    </dialog>
 
 
     <!-- Info Modal Dialog -->
@@ -1051,13 +1091,15 @@
             "January", "February", "March", "April", "May", "June", 
             "July", "August", "September", "October", "November", "December"
         ];
-        const START_YEAR = 1947;
-        const END_YEAR = 1951;
+        // MODIFIED: Changed from const to let
+        let START_YEAR = 1947;
+        let END_YEAR = 1951;
         
         let DAY_OPTIONS_HTML = ''; // Will be populated once
 
         // DOM Elements
         const header = document.querySelector('header'); // NEW
+        const headerFocus = document.getElementById('headerFocus'); // NEW
         const timelineContainer = document.getElementById('timeline-container');
         const userInfo = document.getElementById('userInfo');
         const modal = document.getElementById('infoModal');
@@ -1179,6 +1221,15 @@
         const analysisFigureDescription = document.getElementById('analysisFigureDescription');
         const analysisFigurePreview = document.getElementById('analysis-figure-preview'); // NEW
  
+        // --- NEW: Timeline Range Modal Elements ---
+        const createTimelineBtn = document.getElementById('createTimelineBtn');
+        const timelineRangeModal = document.getElementById('timelineRangeModal');
+        const timelineRangeForm = document.getElementById('timelineRangeForm');
+        const startYearInput = document.getElementById('startYearInput');
+        const endYearInput = document.getElementById('endYearInput');
+        const timelineRangeCancel = document.getElementById('timelineRangeCancel');
+
+
         // --- INITIALIZATION ---
  
         document.addEventListener('DOMContentLoaded', () => {
@@ -1200,11 +1251,8 @@
                 loadUiSettings();
                 
                 // NEW: Populate Analysis Year Selector
-                let yearOptions = '';
-                for (let y = START_YEAR; y <= END_YEAR; y++) {
-                    yearOptions += `<option value="${y}">${y}</option>`;
-                }
-                analysisYearSelect.innerHTML = yearOptions;
+                // MODIFIED: Moved logic to a helper function
+                populateAnalysisYearDropdown();
 
                 // Render the static HTML structure
                 renderTimelineStructure();
@@ -1263,10 +1311,8 @@
                     await addInitialData();
 
                     // --- Start all data listeners ---
-                    listenForTimelineData();
-                    listenForContextData();
-                    listenForSummaries();
-                    listenForKeyFigures();
+                    // MODIFIED: Use helper function
+                    initializeDataListeners();
                     // --------------------------------
                     
                     // Show the app, hide the login
@@ -1286,10 +1332,8 @@
                     userInfo.textContent = "Please sign in.";
                     
                     // Stop all listeners
-                    if (unsubscribeTimeline) unsubscribeTimeline();
-                    if (unsubscribeContext) unsubscribeContext();
-                    if (unsubscribeSummaries) unsubscribeSummaries();
-                    if (unsubscribeKeyFigures) unsubscribeKeyFigures();
+                    // MODIFIED: Use helper function
+                    detachDataListeners();
                     
                     // Hide the app, show the login
                     mainAppContent.style.display = 'none';
@@ -1357,8 +1401,10 @@
         function renderTimelineStructure() {
             timelineContainer.innerHTML = ''; // Clear existing
             
+            // Re-add the context bar container which was cleared
             timelineContainer.innerHTML = '<div id="context-bar-container"></div>';
 
+            // MODIFIED: Uses global START_YEAR and END_YEAR
             for (let year = START_YEAR; year <= END_YEAR; year++) {
                 const yearHeader = document.createElement('div');
                 yearHeader.className = 'year-block text-center';
@@ -1401,6 +1447,8 @@
                 });
             }
             
+            // MODIFIED: This function must be called to repopulate dropdowns
+            // with the new year range.
             populateContextDateDropdowns();
             
             // After rendering, set up the observer
@@ -1409,6 +1457,7 @@
 
         /**
          * Populates the date dropdowns in the context modal.
+         * MODIFIED: Now uses global START_YEAR and END_YEAR
          */
         function populateContextDateDropdowns() {
             const yearOptions = [];
@@ -1440,7 +1489,52 @@
             contextEndMonth.value = "December";
             contextEndDay.value = 31;
         }
- 
+
+        /**
+         * NEW: Populates the year dropdown in the analysis modal.
+         */
+        function populateAnalysisYearDropdown() {
+            let yearOptions = '';
+            for (let y = START_YEAR; y <= END_YEAR; y++) {
+                yearOptions += `<option value="${y}">${y}</option>`;
+            }
+            analysisYearSelect.innerHTML = yearOptions;
+            
+            // After populating, update the modal to show the first year's data
+            // (or reset to the new first year)
+            if (analysisYearSelect.value) {
+                updateAnalysisModal(analysisYearSelect.value);
+            }
+        }
+
+        // --- NEW: DATA LISTENER HELPER FUNCTIONS ---
+
+        /**
+         * NEW: Detaches all active Firestore listeners.
+         */
+        function detachDataListeners() {
+            if (unsubscribeTimeline) unsubscribeTimeline();
+            if (unsubscribeContext) unsubscribeContext();
+            if (unsubscribeSummaries) unsubscribeSummaries();
+            if (unsubscribeKeyFigures) unsubscribeKeyFigures();
+            unsubscribeTimeline = null;
+            unsubscribeContext = null;
+            unsubscribeSummaries = null;
+            unsubscribeKeyFigures = null;
+        }
+
+        /**
+         * NEW: Initializes all Firestore listeners.
+         */
+        function initializeDataListeners() {
+            if (!isAuthReady) return; // Guard
+            
+            listenForTimelineData();
+            listenForContextData();
+            listenForSummaries();
+            listenForKeyFigures();
+        }
+
         // --- DATA LISTENER FUNCTIONS ---
 
         /**
@@ -1462,6 +1556,11 @@
                     if (id === 'init_flag') return;
 
                     const { year, month, info } = data;
+
+                    // NEW: Filter out data not in the current year range
+                    if (year < START_YEAR || year > END_YEAR) {
+                        return;
+                    }
                     
                     const contentEl = document.getElementById(`content-${year}-${month}`);
                     const buttonsEl = document.getElementById(`buttons-${year}-${month}`);
@@ -1621,6 +1720,11 @@
                 const { eventType, eventTitle, eventColor, year, month } = data;
                 if (!eventTitle || (eventType !== 'start' && eventType !== 'end')) return;
                 
+                // NEW: Filter out data not in the current year range
+                if (year < START_YEAR || year > END_YEAR) {
+                    return;
+                }
+
                 const monthItemEl = document.getElementById(`month-item-${year}-${month}`);
                 if (!monthItemEl) return;
                 
@@ -1692,6 +1796,10 @@
             
             const rolesMap = new Map();
             allContextData.forEach(item => {
+                // NEW: Filter out data not in the current year range
+                if (item.startYear > END_YEAR || item.endYear < START_YEAR) {
+                    return;
+                }
                 if (!rolesMap.has(item.role)) {
                     rolesMap.set(item.role, []);
                 }
@@ -1715,8 +1823,23 @@
                 laneEl.appendChild(legendEl);
 
                 segments.forEach(segment => {
-                    const startEl = document.getElementById(`month-item-${segment.startYear}-${segment.startMonth}`);
-                    const endEl = document.getElementById(`month-item-${segment.endYear}-${segment.endMonth}`);
+                    // NEW: Clamp start and end dates to the timeline range
+                    let segmentStartYear = segment.startYear;
+                    let segmentStartMonth = segment.startMonth;
+                    let segmentEndYear = segment.endYear;
+                    let segmentEndMonth = segment.endMonth;
+
+                    if (segmentStartYear < START_YEAR) {
+                        segmentStartYear = START_YEAR;
+                        segmentStartMonth = MONTHS[0];
+                    }
+                    if (segmentEndYear > END_YEAR) {
+                        segmentEndYear = END_YEAR;
+                        segmentEndMonth = MONTHS[11];
+                    }
+
+                    const startEl = document.getElementById(`month-item-${segmentStartYear}-${segmentStartMonth}`);
+                    const endEl = document.getElementById(`month-item-${segmentEndYear}-${segmentEndMonth}`);
                     
                     if (!startEl || !endEl) return;
 
@@ -1808,6 +1931,14 @@
          * Updates the content of the sticky sidebar based on the active year.
          */
         function updateSidebarContent(year) {
+            // NEW: Ensure the year is within the current range.
+            // If the user shrinks the range, the old `currentActiveYear` might be invalid.
+            // Default to the new START_YEAR if it's out of bounds.
+            if (year < START_YEAR || year > END_YEAR) {
+                year = START_YEAR.toString();
+                currentActiveYear = year;
+            }
+            
             if (!year) return;
             
             // 1. Update Title
@@ -2113,6 +2244,18 @@
                     handleDeleteFigure(id);
                 }
             });
+
+            // --- NEW: Timeline Range Modal Listeners ---
+            createTimelineBtn.addEventListener('click', () => {
+                startYearInput.value = START_YEAR;
+                endYearInput.value = END_YEAR;
+                timelineRangeModal.showModal();
+            });
+            timelineRangeCancel.addEventListener('click', () => timelineRangeModal.close());
+            timelineRangeForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                handleCreateTimeline();
+            });
         }
         
         /**
@@ -2212,6 +2355,45 @@
         
         
         // --- MODAL/FORM HANDLER FUNCTIONS ---
+
+        /**
+         * NEW: Handles the creation of a new timeline range.
+         */
+        function handleCreateTimeline() {
+            const newStart = parseInt(startYearInput.value);
+            const newEnd = parseInt(endYearInput.value);
+
+            if (isNaN(newStart) || isNaN(newEnd) || newStart > newEnd) {
+                console.error("Invalid year range.");
+                // You could add an error message to the modal here
+                return;
+            }
+
+            START_YEAR = newStart;
+            END_YEAR = newEnd;
+            headerFocus.textContent = `Focus: ${START_YEAR} - ${END_YEAR}`;
+            
+            // 1. Detach old listeners
+            detachDataListeners();
+            
+            // 2. Re-render skeleton
+            renderTimelineStructure(); // This clears the timeline container
+            
+            // 3. Re-populate dropdowns
+            populateContextDateDropdowns();
+            populateAnalysisYearDropdown(); 
+            
+            // 4. Update sticky positions and re-init observer
+            updateStickyTop();
+            
+            // 5. Re-attach listeners which will fetch and populate the new skeleton
+            initializeDataListeners();
+            
+            // 6. Update sidebar to the new default year
+            updateSidebarContent(START_YEAR.toString());
+            
+            timelineRangeModal.close();
+        }
 
         /**
          * Creates a new blank note entry field in the modal.
